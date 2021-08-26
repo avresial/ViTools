@@ -71,7 +71,7 @@ namespace ViTool.Models
 
         public async Task MirrorImgAsync(string directory)
         {
-            Output += "Loading fles \n";
+            Output = "Loading fles \n";
             HowMuchLeft = 0;
             HowMuchThereIs = 0;
 
@@ -82,7 +82,6 @@ namespace ViTool.Models
             string imgExt = ".jpg";
             string xmlExt = ".xml";
             string txtExt = ".txt";
-            Console.WriteLine("Start");
 
             imgDirectory = directory;
 
@@ -124,7 +123,6 @@ namespace ViTool.Models
                 {
                     SaveXml(imgSrc, mirroredImgDirectory, xmlExt, FlipXml(imgSrc));
                     howMuchLeft--;
-                    Console.WriteLine("Left - " + howMuchLeft);
                 }
 
                 if (Path.GetExtension(imgSrc) == imgExt)
@@ -153,9 +151,7 @@ namespace ViTool.Models
                 int newXmax = frameWidth - test;
                 XmlNode xmax = currentNode.SelectSingleNode("bndbox/xmax");
                 xmax.InnerText = newXmax.ToString();
-
-
-            }
+                            }
             return doc;
         }
 
@@ -165,7 +161,7 @@ namespace ViTool.Models
             xmlFilename += "Mirrored" + xmlExt;
             string mirroredXmlSrc = Path.Combine(mirroredImgDirectory, xmlFilename);
             doc.Save(mirroredXmlSrc);
-            Console.WriteLine("Saveing - " + xmlFilename);
+            Output += "Saveing - " + xmlFilename + "\n";
         }
 
         Bitmap FlipImg(string imgSrc)
