@@ -17,6 +17,7 @@ namespace ViTool.ViewModel
     {
         private SolidColorBrush busyColor = new SolidColorBrush(Color.FromRgb(255, 255, 0));
         private SolidColorBrush doneColor = new SolidColorBrush(Color.FromRgb(0, 204, 0));
+        private SolidColorBrush errorColor = new SolidColorBrush(Color.FromRgb(216, 31, 42));
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
         {
@@ -116,17 +117,25 @@ namespace ViTool.ViewModel
                     _CreateTxtFromXml = new RelayCommand(
                     async () =>
                     {
-                        TranslateXmlToTxTSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        TranslateXmlToTxTSrc = selectPath("C:\\");
                         TranslateXmlToTxTInfoBrush = busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
-                            await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
-                            TranslateXmlToTxTInfoBrush = doneColor;
+                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
+                            if (result)
+                                TranslateXmlToTxTInfoBrush = doneColor;
+                            else
+                                TranslateXmlToTxTInfoBrush = errorColor;
+                        }
+                        else
+                        {
+                            TranslateXmlToTxTInfoBrush = errorColor;
+                            TranslateXmlToTxT.Output = "There is no files";
                         }
                     },
                     () =>
                     {
-                        return true;
+                        return !TranslateXmlToTxT.IsRunning;
                     });
                 }
 
@@ -144,18 +153,27 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     async () =>
                     {
-                        MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        MirrorSrc = selectPath("C:\\");
                         MirrorAlgorithmBrush = busyColor;
-                        if (MirrorSrc != null && MirrorSrc != "") 
+                        if (MirrorSrc != null && MirrorSrc != "")
                         {
-                            await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
+                            bool result = await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
 
-                            MirrorAlgorithmBrush = doneColor;
+                            if (result)
+                                MirrorAlgorithmBrush = doneColor;
+                            else
+                                MirrorAlgorithmBrush = errorColor;
+
+                        }
+                        else
+                        {
+                            MirrorAlgorithmBrush = errorColor;
+                            MirrorAlgorithm.Output = "There is no files";
                         }
                     },
                     () =>
                     {
-                        return true;
+                        return !MirrorAlgorithm.IsRunning;
                     });
                 }
 
