@@ -127,6 +127,7 @@ namespace ViTool.ViewModel
                         else
                         {
                             TranslateXmlToTxTInfoBrush = errorColor;
+                            TranslateXmlToTxT.Output = "There is no files";
                         }
                     },
                     () =>
@@ -160,6 +161,7 @@ namespace ViTool.ViewModel
                         else 
                         {
                             MirrorAlgorithmBrush = errorColor;
+                            MirrorAlgorithm.Output = "There is no files";
                         }
                     },
                     () =>
