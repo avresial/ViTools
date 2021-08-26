@@ -121,8 +121,11 @@ namespace ViTool.ViewModel
                         TranslateXmlToTxTInfoBrush = busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
-                            await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
-                            TranslateXmlToTxTInfoBrush = doneColor;
+                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
+                            if (result)
+                                TranslateXmlToTxTInfoBrush = doneColor;
+                            else
+                                TranslateXmlToTxTInfoBrush = errorColor;
                         }
                         else
                         {
@@ -154,9 +157,13 @@ namespace ViTool.ViewModel
                         MirrorAlgorithmBrush = busyColor;
                         if (MirrorSrc != null && MirrorSrc != "")
                         {
-                            await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
+                            bool result = await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
 
-                            MirrorAlgorithmBrush = doneColor;
+                            if (result)
+                                MirrorAlgorithmBrush = doneColor;
+                            else
+                                MirrorAlgorithmBrush = errorColor;
+
                         }
                         else
                         {

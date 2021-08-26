@@ -84,7 +84,7 @@ namespace ViTool.Models
 
 
 
-        public async Task TranslateXmlToTxTAsync(string directory, string xmlExt)
+        public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt)
         {
             IsRunning = true;
             Output = "";
@@ -94,64 +94,69 @@ namespace ViTool.Models
             string[] Files = Directory.GetFiles(directory);
 
             foreach (string fileSrc in Files)
-            {
                 if (Path.GetExtension(fileSrc) == xmlExt)
-                {
                     HowMuchThereIs++;
-                    HowMuchLeft++;
-                }
 
+            HowMuchLeft = HowMuchThereIs;
+
+            if (HowMuchThereIs == 0)
+            {
+                Output = "No valid files in given Directory";
+                IsRunning = false;
+                return false;
             }
-
-
 
             foreach (string fileSrc in Files)
             {
-                if (Path.GetExtension(fileSrc) == xmlExt)
+                if (Path.GetExtension(fileSrc) != xmlExt)
+                    continue;
+
+                List<TxtDefectRow> defects = new List<TxtDefectRow>();
+                XmlDocument doc = new XmlDocument();
+                doc.Load(fileSrc);
+                int frameWidth = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/width").InnerText);
+                int frameHeight = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/height").InnerText);
+
+                var nodes = doc.DocumentElement.SelectNodes("/annotation/object");
+
+                foreach (XmlNode currentNode in nodes)
                 {
-                    List<TxtDefectRow> defects = new List<TxtDefectRow>();
-                    XmlDocument doc = new XmlDocument();
-                    doc.Load(fileSrc);
-                    int frameWidth = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/width").InnerText);
-                    int frameHeight = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/height").InnerText);
+                    TxtDefectRow defectRow = new TxtDefectRow();
 
-                    var nodes = doc.DocumentElement.SelectNodes("/annotation/object");
+                    int xmin = int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
+                    int xmax = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
+                    int ymin = int.Parse(currentNode.SelectSingleNode("bndbox/ymin").InnerText);
+                    int ymax = int.Parse(currentNode.SelectSingleNode("bndbox/ymax").InnerText);
 
-                    foreach (XmlNode currentNode in nodes)
-                    {
-                        TxtDefectRow defectRow = new TxtDefectRow();
+                    defectRow.Left = Math.Round(((double)(xmax + xmin) / 2) / (double)frameWidth, 5);
+                    defectRow.Top = Math.Round(((double)(ymax + ymin) / 2) / (double)frameHeight, 5);
+                    defectRow.Width = Math.Round((double)(xmax - xmin) / frameWidth, 5);
+                    defectRow.Height = Math.Round((double)(ymax - ymin) / frameHeight, 5);
 
-                        int xmin = int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
-                        int xmax = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
-                        int ymin = int.Parse(currentNode.SelectSingleNode("bndbox/ymin").InnerText);
-                        int ymax = int.Parse(currentNode.SelectSingleNode("bndbox/ymax").InnerText);
+                    string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
 
-                        defectRow.Left = Math.Round(((double)(xmax + xmin) / 2) / (double)frameWidth, 5);
-                        defectRow.Top = Math.Round(((double)(ymax + ymin) / 2) / (double)frameHeight, 5);
+                    object Classes = Enum.Parse(typeof(Classes), defectType);
+                    defectRow.DefectType = (int)Classes;
 
-                        defectRow.Width = Math.Round((double)(xmax - xmin) / frameWidth, 5);
-                        defectRow.Height = Math.Round((double)(ymax - ymin) / frameHeight, 5);
-
-
-                        string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
-
-                        object Classes = Enum.Parse(typeof(Classes), defectType);
-                        defectRow.DefectType = (int)Classes;
-
-                        defects.Add(defectRow);
-                    }
-
-
-
-                    string xmlFilename = Path.GetFileNameWithoutExtension(fileSrc);
-                    xmlFilename += ".txt";
-                    string mirroredXmlSrc = Path.Combine(directory, xmlFilename);
-                    SaveToTxt(defects, mirroredXmlSrc);
-                    Output += "Saveing - " + mirroredXmlSrc + "\n";
-                    HowMuchLeft--;
+                    defects.Add(defectRow);
                 }
+
+                if (defects.Count == 0)
+                    continue;
+
+                string xmlFilename = Path.GetFileNameWithoutExtension(fileSrc);
+                xmlFilename += ".txt";
+                string mirroredXmlSrc = Path.Combine(directory, xmlFilename);
+                SaveToTxt(defects, mirroredXmlSrc);
+
+                Output += "Saveing - " + mirroredXmlSrc + "\n";
+                HowMuchLeft--;
+
             }
+
+            Output = "Operation Finished";
             IsRunning = false;
+            return true;
         }
 
         void SaveToTxt(List<TxtDefectRow> defectRows, string filename)

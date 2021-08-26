@@ -84,25 +84,27 @@ namespace ViTool.Models
             }
         }
 
-        public async Task MirrorImgAsync(string directory)
+        public async Task<bool> MirrorImgAsync(string directory)
         {
             Output = "Loading fles \n";
             IsRunning = true;
             HowMuchLeft = 0;
             HowMuchThereIs = 0;
 
-
-            string mirroredImgDirectory = "";
-            string imgDirectory;
-            string[] imgFiles;
+            string mirroredImgDirectory;
             string imgExt = ".jpg";
             string xmlExt = ".xml";
-            string txtExt = ".txt";
+            string imgDirectory;
+            string[] imgFiles;
 
             imgDirectory = directory;
 
             if (imgDirectory == null || imgDirectory == "")
-                return;
+            {
+                Output = "No valid Directory";
+                IsRunning = false;
+                return false;
+            }
 
             mirroredImgDirectory = Path.Combine(Path.GetFullPath(Path.Combine(imgDirectory, @"..\")), Path.GetFileName(imgDirectory) + "Mirrored");
 
@@ -113,34 +115,32 @@ namespace ViTool.Models
 
             imgFiles = Directory.GetFiles(imgDirectory);
 
-            if (imgFiles.Count() == 0)
-                return;
-
             foreach (string fileSrc in imgFiles)
                 if (Path.GetExtension(fileSrc) == imgExt)
                     HowMuchThereIs++;
-                
+
             HowMuchLeft = HowMuchThereIs;
 
-            foreach (string file in imgFiles)
-                if (Path.GetExtension(file) != imgExt && Path.GetExtension(file) != xmlExt && Path.GetExtension(file) != txtExt)
-                    return;
+            if (HowMuchThereIs == 0)
+            {
+                Output = "No valid files in given Directory";
+                IsRunning = false;
+                return false;
+            }
 
             ProcessFiles(imgFiles, mirroredImgDirectory, imgExt, xmlExt);
+
+            Output = "Operation Finished";
             IsRunning = false;
+            return true;
         }
 
         void ProcessFiles(string[] imgFiles, string mirroredImgDirectory, string imgExt, string xmlExt)
         {
-            int howMuchLeft = imgFiles.Count() / 2;
-
             foreach (string imgSrc in imgFiles)
             {
                 if (Path.GetExtension(imgSrc) == xmlExt)
-                {
                     SaveXml(imgSrc, mirroredImgDirectory, xmlExt, FlipXml(imgSrc));
-                    howMuchLeft--;
-                }
 
                 if (Path.GetExtension(imgSrc) == imgExt)
                 {
@@ -168,7 +168,7 @@ namespace ViTool.Models
                 int newXmax = frameWidth - test;
                 XmlNode xmax = currentNode.SelectSingleNode("bndbox/xmax");
                 xmax.InnerText = newXmax.ToString();
-                            }
+            }
             return doc;
         }
 
