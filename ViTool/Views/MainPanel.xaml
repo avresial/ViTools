@@ -39,11 +39,11 @@
             <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
                 <TextBlock Text="{Binding TranslateXmlToTxT.Output}" HorizontalAlignment="Center"/>
             </ScrollViewer>
-            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+            <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
                 <TextBlock  Text="{Binding TranslateXmlToTxT.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" />
             </Border>
-            
-            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+
+            <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
                 <TextBlock Text="{Binding TranslateXmlToTxT.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
             </Border>
             
@@ -57,7 +57,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
 
-
+                
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -68,14 +68,14 @@
 
             <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding MirrorSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
             <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
-                <TextBlock Text="Not Implemented" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding MirrorAlgorithm.Output}" HorizontalAlignment="Center"/>
             </ScrollViewer>
-            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
-                <TextBlock  Text="Not Implemented" HorizontalAlignment="Center" />
+            <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock  Text="{Binding MirrorAlgorithm.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" />
             </Border>
 
-            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
-                <TextBlock Text="Not Implemented" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+            <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock Text="{Binding MirrorAlgorithm.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
             </Border>
 
             <Button Grid.Row="3" Grid.ColumnSpan="2"  Content="Mirror IMGs" Command="{Binding MorrorImg}" VerticalAlignment="Bottom"  Margin="5,5,5,5"/>

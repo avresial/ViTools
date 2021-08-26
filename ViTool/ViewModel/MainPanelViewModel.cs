@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 using ViTool.Models;
 
 namespace ViTool.ViewModel
@@ -14,7 +15,8 @@ namespace ViTool.ViewModel
 
     public class MainPanelViewModel : ViewModelBase
     {
-
+        private SolidColorBrush busyColor = new SolidColorBrush(Color.FromRgb(255, 255, 0));
+        private SolidColorBrush doneColor = new SolidColorBrush(Color.FromRgb(0, 204, 0));
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
         {
@@ -26,6 +28,48 @@ namespace ViTool.ViewModel
 
                 _TranslateXmlToTxT = value;
                 RaisePropertyChanged(nameof(TranslateXmlToTxT));
+            }
+        }
+
+        private SolidColorBrush _TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+        public SolidColorBrush TranslateXmlToTxTInfoBrush
+        {
+            get { return _TranslateXmlToTxTInfoBrush; }
+            set
+            {
+                if (_TranslateXmlToTxTInfoBrush == value)
+                    return;
+
+                _TranslateXmlToTxTInfoBrush = value;
+                RaisePropertyChanged(nameof(TranslateXmlToTxTInfoBrush));
+            }
+        }
+
+        private MirrorAlgorithm _MirrorAlgorithm = new MirrorAlgorithm();
+        public MirrorAlgorithm MirrorAlgorithm
+        {
+            get { return _MirrorAlgorithm; }
+            set
+            {
+                if (_MirrorAlgorithm == value)
+                    return;
+
+                _MirrorAlgorithm = value;
+                RaisePropertyChanged(nameof(MirrorAlgorithm));
+            }
+        }
+
+        private SolidColorBrush _MirrorAlgorithmBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+        public SolidColorBrush MirrorAlgorithmBrush
+        {
+            get { return _MirrorAlgorithmBrush; }
+            set
+            {
+                if (_MirrorAlgorithmBrush == value)
+                    return;
+
+                _MirrorAlgorithmBrush = value;
+                RaisePropertyChanged(nameof(MirrorAlgorithmBrush));
             }
         }
 
@@ -73,8 +117,12 @@ namespace ViTool.ViewModel
                     async () =>
                     {
                         TranslateXmlToTxTSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        TranslateXmlToTxTInfoBrush = busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
+                        {
                             await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
+                            TranslateXmlToTxTInfoBrush = doneColor;
+                        }
                     },
                     () =>
                     {
@@ -96,7 +144,10 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     () =>
                     {
-                        MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        //MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        //if (MirrorSrc != null && MirrorSrc != "")
+                        MirrorAlgorithm.MirrorImg(MirrorSrc);
+                        MirrorAlgorithmBrush = busyColor;
                     },
                     () =>
                     {

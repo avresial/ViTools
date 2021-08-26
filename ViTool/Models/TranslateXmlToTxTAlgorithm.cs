@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Windows.Media;
 using System.Xml;
 
 namespace ViTool.Models
@@ -41,7 +39,7 @@ namespace ViTool.Models
             }
         }
 
-        private int _HowMuchLeft ;
+        private int _HowMuchLeft;
         public int HowMuchLeft
         {
             get { return _HowMuchLeft; }
@@ -54,6 +52,7 @@ namespace ViTool.Models
                 RaisePropertyChanged(nameof(HowMuchLeft));
             }
         }
+
         private int _HowMuchThereIs;
         public int HowMuchThereIs
         {
@@ -68,12 +67,14 @@ namespace ViTool.Models
             }
         }
 
+
+
         public async Task TranslateXmlToTxTAsync(string directory, string xmlExt)
         {
             Output = "";
-            HowMuchThereIs=0;
-            HowMuchLeft=0;
-          
+            HowMuchThereIs = 0;
+            HowMuchLeft = 0;
+
             string[] Files = Directory.GetFiles(directory);
 
             foreach (string fileSrc in Files)
@@ -83,10 +84,10 @@ namespace ViTool.Models
                     HowMuchThereIs++;
                     HowMuchLeft++;
                 }
-                
+
             }
 
-            
+
 
             foreach (string fileSrc in Files)
             {

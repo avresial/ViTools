@@ -80,6 +80,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\Classes.cs" />
+    <Compile Include="Models\MirrorAlgorithm.cs" />
     <Compile Include="Models\TranslateXmlToTxTAlgorithm.cs" />
     <Compile Include="Models\TxtDefectRow.cs" />
     <Compile Include="ViewModel\MainPanelViewModel.cs" />
