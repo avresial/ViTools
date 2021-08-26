@@ -132,7 +132,7 @@ namespace ViTool.ViewModel
                     },
                     () =>
                     {
-                        return true;
+                        return !TranslateXmlToTxT.IsRunning;
                     });
                 }
 
@@ -158,7 +158,7 @@ namespace ViTool.ViewModel
 
                             MirrorAlgorithmBrush = doneColor;
                         }
-                        else 
+                        else
                         {
                             MirrorAlgorithmBrush = errorColor;
                             MirrorAlgorithm.Output = "There is no files";
@@ -166,7 +166,7 @@ namespace ViTool.ViewModel
                     },
                     () =>
                     {
-                        return true;
+                        return !MirrorAlgorithm.IsRunning;
                     });
                 }
 

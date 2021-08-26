@@ -67,10 +67,26 @@ namespace ViTool.Models
             }
         }
 
+        private bool _IsRunning = false;
+        public bool IsRunning
+        {
+            get { return _IsRunning; }
+            set
+            {
+                if (_IsRunning == value)
+                    return;
+
+                _IsRunning = value;
+                RaisePropertyChanged(nameof(IsRunning));
+            }
+        }
+
+
 
 
         public async Task TranslateXmlToTxTAsync(string directory, string xmlExt)
         {
+            IsRunning = true;
             Output = "";
             HowMuchThereIs = 0;
             HowMuchLeft = 0;
@@ -135,6 +151,7 @@ namespace ViTool.Models
                     HowMuchLeft--;
                 }
             }
+            IsRunning = false;
         }
 
         void SaveToTxt(List<TxtDefectRow> defectRows, string filename)

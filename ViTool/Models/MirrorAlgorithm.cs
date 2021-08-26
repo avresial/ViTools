@@ -55,6 +55,7 @@ namespace ViTool.Models
                 RaisePropertyChanged(nameof(HowMuchLeft));
             }
         }
+
         private int _HowMuchThereIs;
         public int HowMuchThereIs
         {
@@ -69,9 +70,24 @@ namespace ViTool.Models
             }
         }
 
+        private bool _IsRunning = false;
+        public bool IsRunning
+        {
+            get { return _IsRunning; }
+            set
+            {
+                if (_IsRunning == value)
+                    return;
+
+                _IsRunning = value;
+                RaisePropertyChanged(nameof(IsRunning));
+            }
+        }
+
         public async Task MirrorImgAsync(string directory)
         {
             Output = "Loading fles \n";
+            IsRunning = true;
             HowMuchLeft = 0;
             HowMuchThereIs = 0;
 
@@ -111,6 +127,7 @@ namespace ViTool.Models
                     return;
 
             ProcessFiles(imgFiles, mirroredImgDirectory, imgExt, xmlExt);
+            IsRunning = false;
         }
 
         void ProcessFiles(string[] imgFiles, string mirroredImgDirectory, string imgExt, string xmlExt)
