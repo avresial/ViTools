@@ -142,12 +142,16 @@ namespace ViTool.ViewModel
                 if (_MorrorImg == null)
                 {
                     _MorrorImg = new RelayCommand(
-                    () =>
+                    async () =>
                     {
-                        //MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
-                        //if (MirrorSrc != null && MirrorSrc != "")
-                        MirrorAlgorithm.MirrorImg(MirrorSrc);
+                        MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
                         MirrorAlgorithmBrush = busyColor;
+                        if (MirrorSrc != null && MirrorSrc != "") 
+                        {
+                            await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
+
+                            MirrorAlgorithmBrush = doneColor;
+                        }
                     },
                     () =>
                     {

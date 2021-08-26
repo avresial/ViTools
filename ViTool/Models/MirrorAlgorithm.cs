@@ -2,8 +2,11 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace ViTool.Models
@@ -66,12 +69,143 @@ namespace ViTool.Models
             }
         }
 
-        public void MirrorImg(string directory) 
+        public async Task MirrorImgAsync(string directory)
         {
-            Output += "Not Implemented \n";
-            HowMuchLeft++;
-            HowMuchThereIs++;
+            Output += "Loading fles \n";
+            HowMuchLeft = 0;
+            HowMuchThereIs = 0;
+
+
+            string mirroredImgDirectory = "";
+            string imgDirectory;
+            string[] imgFiles;
+            string imgExt = ".jpg";
+            string xmlExt = ".xml";
+            string txtExt = ".txt";
+            Console.WriteLine("Start");
+
+            imgDirectory = directory;
+
+            if (imgDirectory == null || imgDirectory == "")
+                return;
+
+            mirroredImgDirectory = Path.Combine(Path.GetFullPath(Path.Combine(imgDirectory, @"..\")), Path.GetFileName(imgDirectory) + "Mirrored");
+
+            if (Directory.Exists(mirroredImgDirectory))
+                Directory.Delete(mirroredImgDirectory, true);
+
+            Directory.CreateDirectory(mirroredImgDirectory);
+
+            imgFiles = Directory.GetFiles(imgDirectory);
+
+            if (imgFiles.Count() == 0)
+                return;
+
+            foreach (string fileSrc in imgFiles)
+                if (Path.GetExtension(fileSrc) == imgExt)
+                    HowMuchThereIs++;
+                
+            HowMuchLeft = HowMuchThereIs;
+
+            foreach (string file in imgFiles)
+                if (Path.GetExtension(file) != imgExt && Path.GetExtension(file) != xmlExt && Path.GetExtension(file) != txtExt)
+                    return;
+
+            ProcessFiles(imgFiles, mirroredImgDirectory, imgExt, xmlExt);
         }
 
+        void ProcessFiles(string[] imgFiles, string mirroredImgDirectory, string imgExt, string xmlExt)
+        {
+            int howMuchLeft = imgFiles.Count() / 2;
+
+            foreach (string imgSrc in imgFiles)
+            {
+                if (Path.GetExtension(imgSrc) == xmlExt)
+                {
+                    SaveXml(imgSrc, mirroredImgDirectory, xmlExt, FlipXml(imgSrc));
+                    howMuchLeft--;
+                    Console.WriteLine("Left - " + howMuchLeft);
+                }
+
+                if (Path.GetExtension(imgSrc) == imgExt)
+                {
+                    SaveImg(imgSrc, mirroredImgDirectory, imgExt, FlipImg(imgSrc));
+                    HowMuchLeft--;
+                }
+            }
+        }
+
+        XmlDocument FlipXml(string imgSrc)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(imgSrc);
+            int frameWidth = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/width").InnerText);
+
+            var nodes = doc.DocumentElement.SelectNodes("/annotation/object");
+
+            foreach (XmlNode currentNode in nodes)
+            {
+                int newXmin = frameWidth - int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
+                XmlNode node = currentNode.SelectSingleNode("bndbox/xmin");
+                node.InnerText = newXmin.ToString();
+
+                int test = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
+                int newXmax = frameWidth - test;
+                XmlNode xmax = currentNode.SelectSingleNode("bndbox/xmax");
+                xmax.InnerText = newXmax.ToString();
+
+
+            }
+            return doc;
+        }
+
+        void SaveXml(string imgSrc, string mirroredImgDirectory, string xmlExt, XmlDocument doc)
+        {
+            string xmlFilename = Path.GetFileNameWithoutExtension(imgSrc);
+            xmlFilename += "Mirrored" + xmlExt;
+            string mirroredXmlSrc = Path.Combine(mirroredImgDirectory, xmlFilename);
+            doc.Save(mirroredXmlSrc);
+            Console.WriteLine("Saveing - " + xmlFilename);
+        }
+
+        Bitmap FlipImg(string imgSrc)
+        {
+            Bitmap newBitmap = GetImg(imgSrc);
+
+            if (newBitmap == null)
+                return newBitmap;
+
+            newBitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
+
+            return newBitmap;
+        }
+
+        void SaveImg(string imgSrc, string mirroredImgDirectory, string imgExt, Bitmap img)
+        {
+
+            string imgFilename = Path.GetFileNameWithoutExtension(imgSrc);
+            imgFilename += "Mirrored" + imgExt;
+
+            string mirroredImgSrc = Path.Combine(mirroredImgDirectory, imgFilename);
+            img.Save(mirroredImgSrc);
+            Output += "Saveing - " + imgFilename + "\n";
+
+        }
+
+        Bitmap GetImg(string imgFiles)
+        {
+            Bitmap bitmap1 = null;
+
+            try
+            {
+                return (Bitmap)Bitmap.FromFile(imgFiles);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                MessageBox.Show("There was an error. Check the path to the bitmap.");
+            }
+
+            return bitmap1;
+        }
     }
 }
