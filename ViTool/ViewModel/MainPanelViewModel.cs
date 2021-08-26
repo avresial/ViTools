@@ -17,6 +17,7 @@ namespace ViTool.ViewModel
     {
         private SolidColorBrush busyColor = new SolidColorBrush(Color.FromRgb(255, 255, 0));
         private SolidColorBrush doneColor = new SolidColorBrush(Color.FromRgb(0, 204, 0));
+        private SolidColorBrush errorColor = new SolidColorBrush(Color.FromRgb(216, 31, 42));
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
         {
@@ -123,6 +124,10 @@ namespace ViTool.ViewModel
                             await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
                             TranslateXmlToTxTInfoBrush = doneColor;
                         }
+                        else
+                        {
+                            TranslateXmlToTxTInfoBrush = errorColor;
+                        }
                     },
                     () =>
                     {
@@ -146,11 +151,15 @@ namespace ViTool.ViewModel
                     {
                         MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
                         MirrorAlgorithmBrush = busyColor;
-                        if (MirrorSrc != null && MirrorSrc != "") 
+                        if (MirrorSrc != null && MirrorSrc != "")
                         {
                             await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
 
                             MirrorAlgorithmBrush = doneColor;
+                        }
+                        else 
+                        {
+                            MirrorAlgorithmBrush = errorColor;
                         }
                     },
                     () =>
