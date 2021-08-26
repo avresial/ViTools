@@ -29,7 +29,7 @@ namespace ViTool.ViewModel
             }
         }
 
-        private String _TranslateXmlToTxTSrc;
+        private String _TranslateXmlToTxTSrc = "No directory location";
         public String TranslateXmlToTxTSrc
         {
             get { return _TranslateXmlToTxTSrc; }
@@ -43,6 +43,19 @@ namespace ViTool.ViewModel
             }
         }
 
+        private String _MirrorSrc = "No directory location";
+        public String MirrorSrc
+        {
+            get { return _MirrorSrc; }
+            set
+            {
+                if (_MirrorSrc == value)
+                    return;
+
+                _MirrorSrc = value;
+                RaisePropertyChanged(nameof(MirrorSrc));
+            }
+        }
 
         public MainPanelViewModel()
         {
@@ -83,7 +96,7 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     () =>
                     {
-                        ;
+                        MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
                     },
                     () =>
                     {

@@ -130,7 +130,7 @@ namespace ViTool.Models
                     xmlFilename += ".txt";
                     string mirroredXmlSrc = Path.Combine(directory, xmlFilename);
                     SaveToTxt(defects, mirroredXmlSrc);
-                    Output += "writing " + mirroredXmlSrc + "\n";
+                    Output += "Saveing - " + mirroredXmlSrc + "\n";
                     HowMuchLeft--;
                 }
             }

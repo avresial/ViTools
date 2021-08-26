@@ -15,8 +15,8 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*" MinWidth="400"/>
+            <ColumnDefinition Width="*" MinWidth="400"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
@@ -35,16 +35,51 @@
             </Grid.ColumnDefinitions>
 
             
-            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding TranslateXmlToTxTSrc,StringFormat=Translate Xml To TxT Src - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
+            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding TranslateXmlToTxTSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
             <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
-                <TextBlock Text="{Binding TranslateXmlToTxT.Output}"/>
+                <TextBlock Text="{Binding TranslateXmlToTxT.Output}" HorizontalAlignment="Center"/>
             </ScrollViewer>
-            <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding TranslateXmlToTxT.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" Margin="0,5,0,10"/>
-            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding TranslateXmlToTxT.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center" Margin="0,5,0,10"/>
-            <Button Content="create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}"/>
+            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock  Text="{Binding TranslateXmlToTxT.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" />
+            </Border>
+            
+            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock Text="{Binding TranslateXmlToTxT.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+            </Border>
+            
+            <Button Content="Create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}" Margin="5,5,5,5"/>
         </Grid>
+        
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
 
-        <Button Content="Mirror IMG" Grid.Column="1" Command="{Binding MorrorImg}"/>
+
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding MirrorSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
+            <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
+                <TextBlock Text="Not Implemented" HorizontalAlignment="Center"/>
+            </ScrollViewer>
+            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock  Text="Not Implemented" HorizontalAlignment="Center" />
+            </Border>
+
+            <Border BorderBrush="LightGray" BorderThickness="0,0,0,1"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+                <TextBlock Text="Not Implemented" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+            </Border>
+
+            <Button Grid.Row="3" Grid.ColumnSpan="2"  Content="Mirror IMGs" Command="{Binding MorrorImg}" VerticalAlignment="Bottom"  Margin="5,5,5,5"/>
+        </Grid>
 
     </Grid>
 </UserControl>
