@@ -117,7 +117,7 @@ namespace ViTool.ViewModel
                     _CreateTxtFromXml = new RelayCommand(
                     async () =>
                     {
-                        TranslateXmlToTxTSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        TranslateXmlToTxTSrc = selectPath("C:\\");
                         TranslateXmlToTxTInfoBrush = busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
@@ -153,7 +153,7 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     async () =>
                     {
-                        MirrorSrc = selectPath("R:\\Graw\\Defektoskopia\\VI2Defect");
+                        MirrorSrc = selectPath("C:\\");
                         MirrorAlgorithmBrush = busyColor;
                         if (MirrorSrc != null && MirrorSrc != "")
                         {
