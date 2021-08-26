@@ -115,7 +115,7 @@ namespace ViTool.ViewModel
                     _CreateTxtFromXml = new RelayCommand(
                     async () =>
                     {
-                        TranslateXmlToTxTSrc = selectPath("C:\\");
+                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
                         TranslateXmlToTxTInfoBrush = busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
@@ -151,7 +151,7 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     async () =>
                     {
-                        MirrorSrc = selectPath("C:\\");
+                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
                         MirrorAlgorithmBrush = busyColor;
                         if (MirrorSrc != null && MirrorSrc != "")
                         {
@@ -179,10 +179,10 @@ namespace ViTool.ViewModel
             }
         }
 
-        string selectPath(string startingDir)
+        string selectPath(string startingDir, string description)
         {
             FolderBrowserDialog folderDlg = new FolderBrowserDialog();
-
+            folderDlg.Description = description;
             folderDlg.SelectedPath = startingDir;
             folderDlg.ShowNewFolderButton = true;
 
