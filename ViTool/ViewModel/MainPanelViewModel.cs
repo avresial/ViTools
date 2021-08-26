@@ -1,10 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -18,6 +15,7 @@ namespace ViTool.ViewModel
         private SolidColorBrush busyColor = new SolidColorBrush(Color.FromRgb(255, 255, 0));
         private SolidColorBrush doneColor = new SolidColorBrush(Color.FromRgb(0, 204, 0));
         private SolidColorBrush errorColor = new SolidColorBrush(Color.FromRgb(216, 31, 42));
+
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
         {

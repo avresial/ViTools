@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using System.Xml;
 
 namespace ViTool.Models
@@ -80,9 +79,6 @@ namespace ViTool.Models
                 RaisePropertyChanged(nameof(IsRunning));
             }
         }
-
-
-
 
         public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt)
         {
