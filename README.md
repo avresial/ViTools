@@ -2,13 +2,27 @@
 
 ## This app allows user to:
 - Load dataset containing jpgs and their xmls, 
-- Create mirrored copy, 
-- Translate xml files to txt files which is understanded by darknet
+- Create dataset mirrored copy,
+    -   ![MirrorAction](Readme/MirrorAction.png)
+- Translate xml files to txt files which are understanded by darknet
 
 ## Workflow
 1. Use `labelImg` software to create labels for dataset
-2. Use `Vi Tools App -> Mirror IMGs` to create mirror of your dataset
-3. Use `Vi Tools App -> Create TXT files` to translate xmls to txt for darknet
+2. Use `Vi Tools` App -> `Mirror IMGs` function to create mirror of your dataset
+3. Use `Vi Tools` App -> `Create TXT files` function to translate xmls to txt for darknet
+
+## Links you need to know!
+
+- https://github.com/AlexeyAB/darknet
+
+- https://github.com/tzutalin/labelImg
+
+## Technologies
+
+App supports:
+- Asynchronus programming
+- `Colorful` status presentation
+- Mvvm
 
 ## Xml file structure
 
@@ -45,10 +59,15 @@
 ```
 1 0.52502 0.46065 0.09259 0.68766
 ```
-## Guindline
-![GitHub Logo](Readme/MainAppLook.png)
-## Links
+Worth mention that next labels will apear innext rows. Like so
 
-- https://github.com/AlexeyAB/darknet
+```
+1 0.52502 0.46065 0.09259 0.68766
+1 0.52502 0.46065 0.09259 0.68766
+1 0.52502 0.46065 0.09259 0.68766
+```
+And so on.
 
-- https://github.com/tzutalin/labelImg
+## App overview
+
+![MainAppLook](Readme/MainAppLook.png)
