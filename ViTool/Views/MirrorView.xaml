@@ -12,13 +12,11 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-
-
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
 
@@ -35,5 +33,6 @@
         </Border>
 
         <Button Grid.Row="3" Grid.ColumnSpan="2"  Content="Mirror IMGs" Command="{Binding MorrorImg}" VerticalAlignment="Bottom"  Margin="5,5,5,5"/>
+
     </Grid>
 </UserControl>

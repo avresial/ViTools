@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -43,6 +44,7 @@ namespace ViTool.ViewModel
                 RaisePropertyChanged(nameof(MirrorAlgorithmBrush));
             }
         }
+
 
         private String _MirrorSrc = "No directory location";
         public String MirrorSrc
@@ -95,6 +97,8 @@ namespace ViTool.ViewModel
                 return _MorrorImg;
             }
         }
+
+
 
         string selectPath(string startingDir, string description)
         {

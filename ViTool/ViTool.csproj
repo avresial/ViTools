@@ -83,7 +83,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\Classes.cs" />
     <Compile Include="Models\IndicatorColors.cs" />
     <Compile Include="Models\MirrorAlgorithm.cs" />
     <Compile Include="Models\TranslateXmlToTxTAlgorithm.cs" />
