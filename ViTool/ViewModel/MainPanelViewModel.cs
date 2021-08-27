@@ -9,196 +9,36 @@ using ViTool.Models;
 
 namespace ViTool.ViewModel
 {
-
     public class MainPanelViewModel : ViewModelBase
     {
-        private SolidColorBrush busyColor = new SolidColorBrush(Color.FromRgb(255, 255, 0));
-        private SolidColorBrush doneColor = new SolidColorBrush(Color.FromRgb(0, 204, 0));
-        private SolidColorBrush errorColor = new SolidColorBrush(Color.FromRgb(216, 31, 42));
-
-        private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
-        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
+        private MirrorViewModel _MirrorViewModel = new MirrorViewModel();
+        public MirrorViewModel MirrorViewModel
         {
-            get { return _TranslateXmlToTxT; }
+            get { return _MirrorViewModel; }
             set
             {
-                if (_TranslateXmlToTxT == value)
+                if (_MirrorViewModel == value)
                     return;
 
-                _TranslateXmlToTxT = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxT));
+                _MirrorViewModel = value;
+                RaisePropertyChanged(nameof(MirrorViewModel));
             }
         }
 
-        private SolidColorBrush _TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public SolidColorBrush TranslateXmlToTxTInfoBrush
+        private TranslateXmlToTxTViewModel _TranslateXmlToTxTViewModel = new TranslateXmlToTxTViewModel();
+        public TranslateXmlToTxTViewModel TranslateXmlToTxTViewModel
         {
-            get { return _TranslateXmlToTxTInfoBrush; }
+            get { return _TranslateXmlToTxTViewModel; }
             set
             {
-                if (_TranslateXmlToTxTInfoBrush == value)
+                if (_TranslateXmlToTxTViewModel == value)
                     return;
 
-                _TranslateXmlToTxTInfoBrush = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxTInfoBrush));
+                _TranslateXmlToTxTViewModel = value;
+                RaisePropertyChanged(nameof(TranslateXmlToTxTViewModel));
             }
         }
 
-        private MirrorAlgorithm _MirrorAlgorithm = new MirrorAlgorithm();
-        public MirrorAlgorithm MirrorAlgorithm
-        {
-            get { return _MirrorAlgorithm; }
-            set
-            {
-                if (_MirrorAlgorithm == value)
-                    return;
-
-                _MirrorAlgorithm = value;
-                RaisePropertyChanged(nameof(MirrorAlgorithm));
-            }
-        }
-
-        private SolidColorBrush _MirrorAlgorithmBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public SolidColorBrush MirrorAlgorithmBrush
-        {
-            get { return _MirrorAlgorithmBrush; }
-            set
-            {
-                if (_MirrorAlgorithmBrush == value)
-                    return;
-
-                _MirrorAlgorithmBrush = value;
-                RaisePropertyChanged(nameof(MirrorAlgorithmBrush));
-            }
-        }
-
-        private String _TranslateXmlToTxTSrc = "No directory location";
-        public String TranslateXmlToTxTSrc
-        {
-            get { return _TranslateXmlToTxTSrc; }
-            set
-            {
-                if (_TranslateXmlToTxTSrc == value)
-                    return;
-
-                _TranslateXmlToTxTSrc = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxTSrc));
-            }
-        }
-
-        private String _MirrorSrc = "No directory location";
-        public String MirrorSrc
-        {
-            get { return _MirrorSrc; }
-            set
-            {
-                if (_MirrorSrc == value)
-                    return;
-
-                _MirrorSrc = value;
-                RaisePropertyChanged(nameof(MirrorSrc));
-            }
-        }
-
-        public MainPanelViewModel()
-        {
-
-        }
-
-        private RelayCommand _CreateTxtFromXml;
-        public RelayCommand CreateTxtFromXml
-        {
-            get
-            {
-                if (_CreateTxtFromXml == null)
-                {
-                    _CreateTxtFromXml = new RelayCommand(
-                    async () =>
-                    {
-                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
-                        TranslateXmlToTxTInfoBrush = busyColor;
-                        if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
-                        {
-                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
-                            if (result)
-                                TranslateXmlToTxTInfoBrush = doneColor;
-                            else
-                                TranslateXmlToTxTInfoBrush = errorColor;
-                        }
-                        else
-                        {
-                            TranslateXmlToTxTInfoBrush = errorColor;
-                            TranslateXmlToTxT.Output = "There is no files";
-                        }
-                    },
-                    () =>
-                    {
-                        return !TranslateXmlToTxT.IsRunning;
-                    });
-                }
-
-                return _CreateTxtFromXml;
-            }
-        }
-
-        private RelayCommand _MorrorImg;
-        public RelayCommand MorrorImg
-        {
-            get
-            {
-                if (_MorrorImg == null)
-                {
-                    _MorrorImg = new RelayCommand(
-                    async () =>
-                    {
-                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
-                        MirrorAlgorithmBrush = busyColor;
-                        if (MirrorSrc != null && MirrorSrc != "")
-                        {
-                            bool result = await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
-
-                            if (result)
-                                MirrorAlgorithmBrush = doneColor;
-                            else
-                                MirrorAlgorithmBrush = errorColor;
-
-                        }
-                        else
-                        {
-                            MirrorAlgorithmBrush = errorColor;
-                            MirrorAlgorithm.Output = "There is no files";
-                        }
-                    },
-                    () =>
-                    {
-                        return !MirrorAlgorithm.IsRunning;
-                    });
-                }
-
-                return _MorrorImg;
-            }
-        }
-
-        string selectPath(string startingDir, string description)
-        {
-            FolderBrowserDialog folderDlg = new FolderBrowserDialog();
-            folderDlg.Description = description;
-            folderDlg.SelectedPath = startingDir;
-            folderDlg.ShowNewFolderButton = true;
-
-            DialogResult result = folderDlg.ShowDialog();
-
-            if (result == DialogResult.OK)
-            {
-                if (!Directory.Exists(folderDlg.SelectedPath))
-                    return null;
-                return folderDlg.SelectedPath;
-            }
-            else
-            {
-                return null;
-            }
-
-        }
+        public MainPanelViewModel() { }
     }
 }

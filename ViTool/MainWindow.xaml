@@ -8,6 +8,6 @@
         mc:Ignorable="d"
         Title="Vi Tool App" Height="450" Width="900">
     <Grid>
-        <Views:MainPanel DataContext="{Binding MainPanelViewModel}"/>
+        <Views:MainPanel  DataContext="{Binding MainPanelViewModel}"/>
     </Grid>
 </Window>

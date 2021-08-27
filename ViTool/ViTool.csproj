@@ -36,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon2.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net47\CommonServiceLocator.dll</HintPath>
@@ -81,13 +84,22 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\Classes.cs" />
+    <Compile Include="Models\IndicatorColors.cs" />
     <Compile Include="Models\MirrorAlgorithm.cs" />
     <Compile Include="Models\TranslateXmlToTxTAlgorithm.cs" />
     <Compile Include="Models\TxtDefectRow.cs" />
     <Compile Include="ViewModel\MainPanelViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\MirrorViewModel.cs" />
+    <Compile Include="ViewModel\TranslateXmlToTxTViewModel.cs" />
     <Compile Include="Views\MainPanel.xaml.cs">
       <DependentUpon>MainPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MirrorView.xaml.cs">
+      <DependentUpon>MirrorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TranslateXmlToTxTView.xaml.cs">
+      <DependentUpon>TranslateXmlToTxTView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -102,6 +114,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\MainPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MirrorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TranslateXmlToTxTView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,7 +153,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon2.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

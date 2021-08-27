@@ -59,7 +59,7 @@ App supports:
 ```
 1 0.52502 0.46065 0.09259 0.68766
 ```
-Worth mention that next labels will apear innext rows. Like so
+Worth mentioning that next labels will apear in next rows. Their amount is corresponding to 'object' elements in xml file. Like so:
 
 ```
 1 0.52502 0.46065 0.09259 0.68766
