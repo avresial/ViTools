@@ -89,7 +89,7 @@ namespace ViTool.ViewModel
 
 
 
-        private ObservableCollection<string> _ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break","ChippedBreak" };
+        private ObservableCollection<string> _ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
         public ObservableCollection<string> ListOfClasses
         {
             get { return _ListOfClasses; }
@@ -149,7 +149,8 @@ namespace ViTool.ViewModel
                     _AddClass = new RelayCommand(
                     () =>
                     {
-                        ListOfClasses.Add(NewClass);
+                        if (NewClass != null && NewClass != "")
+                            ListOfClasses.Add(NewClass);
                     },
                     () =>
                     {

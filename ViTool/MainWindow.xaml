@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ViTool"
         xmlns:Views="clr-namespace:ViTool.Views"
         mc:Ignorable="d"
-        Title="Vi Tool App" Height="450" Width="900">
+        Title="Vi Tool App" Height="450" Width="1100">
     <Grid>
         <Views:MainPanel  DataContext="{Binding MainPanelViewModel}"/>
     </Grid>
