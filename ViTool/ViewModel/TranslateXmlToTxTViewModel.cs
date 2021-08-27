@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -58,6 +59,50 @@ namespace ViTool.ViewModel
             }
         }
 
+        private string _SelectedClass;
+        public string SelectedClass
+        {
+            get { return _SelectedClass; }
+            set
+            {
+                if (_SelectedClass == value)
+                    return;
+
+                _SelectedClass = value;
+                RaisePropertyChanged(nameof(SelectedClass));
+            }
+        }
+
+        private string _NewClass;
+        public string NewClass
+        {
+            get { return _NewClass; }
+            set
+            {
+                if (_NewClass == value)
+                    return;
+
+                _NewClass = value;
+                RaisePropertyChanged(nameof(NewClass));
+            }
+        }
+
+
+
+        private ObservableCollection<string> _ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break","ChippedBreak" };
+        public ObservableCollection<string> ListOfClasses
+        {
+            get { return _ListOfClasses; }
+            set
+            {
+                if (_ListOfClasses == value)
+                    return;
+
+                _ListOfClasses = value;
+                RaisePropertyChanged(nameof(ListOfClasses));
+            }
+        }
+
         private RelayCommand _CreateTxtFromXml;
         public RelayCommand CreateTxtFromXml
         {
@@ -72,7 +117,7 @@ namespace ViTool.ViewModel
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
-                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml"));
+                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList()));
                             if (result)
                                 TranslateXmlToTxTInfoBrush = indicatorColors.doneColor;
                             else
@@ -91,6 +136,50 @@ namespace ViTool.ViewModel
                 }
 
                 return _CreateTxtFromXml;
+            }
+        }
+
+        private RelayCommand _AddClass;
+        public RelayCommand AddClass
+        {
+            get
+            {
+                if (_AddClass == null)
+                {
+                    _AddClass = new RelayCommand(
+                    () =>
+                    {
+                        ListOfClasses.Add(NewClass);
+                    },
+                    () =>
+                    {
+                        return true;
+                    });
+                }
+
+                return _AddClass;
+            }
+        }
+
+        private RelayCommand _DeleteClass;
+        public RelayCommand DeleteClass
+        {
+            get
+            {
+                if (_DeleteClass == null)
+                {
+                    _DeleteClass = new RelayCommand(
+                    () =>
+                    {
+                        ListOfClasses.Remove(SelectedClass);
+                    },
+                    () =>
+                    {
+                        return true;
+                    });
+                }
+
+                return _DeleteClass;
             }
         }
 

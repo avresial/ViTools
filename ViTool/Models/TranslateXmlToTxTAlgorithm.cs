@@ -80,7 +80,7 @@ namespace ViTool.Models
             }
         }
 
-        public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt)
+        public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt, List<string> classes)
         {
             IsRunning = true;
             Output = "";
@@ -131,10 +131,14 @@ namespace ViTool.Models
 
                     string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
 
-                    object Classes = Enum.Parse(typeof(Classes), defectType);
-                    defectRow.DefectType = (int)Classes;
+                    defectRow.DefectType = -1;
+                    for (int i = 0; i < classes.Count; i++)
+                        if (classes[i] == defectType)
+                            defectRow.DefectType = i;
 
-                    defects.Add(defectRow);
+
+                    if (defectRow.DefectType != -1)
+                        defects.Add(defectRow);
                 }
 
                 if (defects.Count == 0)

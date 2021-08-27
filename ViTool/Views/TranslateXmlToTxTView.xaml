@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ViTool.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="1000">
     <Grid Grid.Column="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -17,8 +17,9 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
 
@@ -36,6 +37,17 @@
             <TextBlock Text="{Binding TranslateXmlToTxT.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
         </Border>
 
-        <Button Content="Create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}" Margin="5,5,5,5"/>
+        <Button Content="Create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}" Margin="5"/>
+
+        <TextBlock Grid.Column="2" Text="Classes" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+        <ListView Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ListOfClasses}" SelectedItem="{Binding SelectedClass}" />
+
+        <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding NewClass}" TextAlignment="Center" Width="200"/>
+
+        <StackPanel Grid.Column="2" Grid.Row="3" Orientation="Horizontal">
+            <Button Content="Delete" Command="{Binding DeleteClass}" Width="100" Margin="5"/>
+            <Button Content="Add" Command="{Binding AddClass}" Width="100" Margin="5"/>
+        </StackPanel>
     </Grid>
 </UserControl>
