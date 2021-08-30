@@ -172,15 +172,11 @@ namespace ViTool.Models
             List<string> lines = new List<string>();
 
             foreach (TxtDefectRow txtDefectRow in defectRows)
-            {
-                string row = txtDefectRow.DefectType + " " + txtDefectRow.Top + " " + txtDefectRow.Left + " " + txtDefectRow.Width + " " + txtDefectRow.Height;
-                lines.Add(row);
-            }
+                lines.Add(txtDefectRow.DefectType + " " + txtDefectRow.Top + " " + txtDefectRow.Left + " " + txtDefectRow.Width + " " + txtDefectRow.Height);
 
             using (StreamWriter file = new StreamWriter(filename))
                 foreach (string line in lines)
                     file.WriteLineAsync(line);
         }
-
     }
 }

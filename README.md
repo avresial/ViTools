@@ -56,6 +56,10 @@ App supports:
 ```
 
 ## Txt file structure
+`[class numer] [Top] [Left] [Width] [Height]`
+
+All values are independent from resolution and are given in percents. 0.52502 means that obiect is located in 52,502% of images height.
+
 ```
 1 0.52502 0.46065 0.09259 0.68766
 ```
