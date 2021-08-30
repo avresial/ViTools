@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,50 +9,9 @@ using System.Xml;
 
 namespace ViTool.Models
 {
-    public class TranslateXmlToTxTAlgorithm : ViewModelBase
+    public class TranslateXmlToTxTAlgorithm
     {
-        private int _MaxOutputLines = 20000;
-        public int MaxOutputLines
-        {
-            get { return _MaxOutputLines; }
-            set
-            {
-                if (_MaxOutputLines == value)
-                    return;
-
-                _MaxOutputLines = value;
-            }
-        }
-
-        private String _Output;
-        public String Output
-        {
-            get { return _Output; }
-            set
-            {
-                if (_Output == value)
-                    return;
-                if (value.Length > _MaxOutputLines)
-                    _Output = "";
-                else
-                    _Output = value;
-                RaisePropertyChanged(nameof(Output));
-            }
-        }
-
-        private int _HowMuchLeft;
-        public int HowMuchLeft
-        {
-            get { return _HowMuchLeft; }
-            set
-            {
-                if (_HowMuchLeft == value)
-                    return;
-
-                _HowMuchLeft = value;
-                RaisePropertyChanged(nameof(HowMuchLeft));
-            }
-        }
+        private List<String> Output = new List<string>();
 
         private int _HowMuchThereIs;
         public int HowMuchThereIs
@@ -63,59 +23,58 @@ namespace ViTool.Models
                     return;
 
                 _HowMuchThereIs = value;
-                RaisePropertyChanged(nameof(HowMuchThereIs));
             }
         }
 
-        private bool _IsRunning = false;
-        public bool IsRunning
-        {
-            get { return _IsRunning; }
-            set
-            {
-                if (_IsRunning == value)
-                    return;
+        public bool IsRunning { get; set; } = false;
 
-                _IsRunning = value;
-                RaisePropertyChanged(nameof(IsRunning));
-            }
-        }
-
-        public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt, List<string> classes)
+        public async Task<bool> TranslateXmlToTxTAsync(string directory, string xmlExt, List<string> classes, IProgress<ProgressReportModel> progress)
         {
             IsRunning = true;
-            Output = "";
+            Output.Clear();
             HowMuchThereIs = 0;
-            HowMuchLeft = 0;
+            ProgressReportModel progressReportModel = new ProgressReportModel();
 
             string[] files = Directory.GetFiles(directory);
 
             HowMuchThereIs = files.Where(x => x.Contains(xmlExt)).Count();
-            HowMuchLeft = HowMuchThereIs;
 
             if (HowMuchThereIs == 0)
             {
-                Output = "No valid files in given Directory";
+                progressReportModel.ErrorMessage = "No valid files in given Directory";
+                progress.Report(progressReportModel);
                 IsRunning = false;
                 return false;
             }
 
-            ProcessFiles(directory, xmlExt, classes, files);
+            await ProcessFilesParalelAsync(directory, xmlExt, classes, files, progress);
 
-            Output = "Operation Finished";
+            progressReportModel.InfoMessage = "Operation Finished";
+            progress.Report(progressReportModel);
+
             IsRunning = false;
             return true;
         }
 
-        private void ProcessFiles(string directory, string xmlExt, List<string> classes, string[] files)
+        private async Task ProcessFilesParalelAsync(string directory, string xmlExt, List<string> classes, string[] files, IProgress<ProgressReportModel> progress)
         {
-            foreach (string fileSrc in files)
+            int timeForOneRecord;
+            int procesorsCount = Environment.ProcessorCount;
+
+            if (procesorsCount >= 4)
+                procesorsCount -= 2;
+
+            await Task.Run(() => Parallel.ForEach<string>(files, new ParallelOptions { MaxDegreeOfParallelism = procesorsCount }, src =>
             {
-                if (Path.GetExtension(fileSrc) != xmlExt)
-                    continue;
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                ProgressReportModel progressReportModel = new ProgressReportModel();
+
+                if (Path.GetExtension(src) != xmlExt)
+                    return;
 
                 XmlDocument doc = new XmlDocument();
-                doc.Load(fileSrc);
+                doc.Load(src);
 
                 int frameWidth = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/width").InnerText);
                 int frameHeight = int.Parse(doc.DocumentElement.SelectSingleNode("/annotation/size/height").InnerText);
@@ -125,16 +84,21 @@ namespace ViTool.Models
                 List<TxtDefectRow> defects = CreateMirroredDefects(classes, doc, frameWidth, frameHeight, nodes);
 
                 if (defects.Count == 0)
-                    continue;
+                    return;
 
-                string xmlFilename = Path.GetFileNameWithoutExtension(fileSrc) + ".txt";
+                string xmlFilename = Path.GetFileNameWithoutExtension(src) + ".txt";
                 string mirroredXmlSrc = Path.Combine(directory, xmlFilename);
 
                 SaveToTxt(defects, mirroredXmlSrc);
+                Output.Add(mirroredXmlSrc);
 
-                Output += "Saveing - " + mirroredXmlSrc + "\n";
-                HowMuchLeft--;
-            }
+                watch.Stop();
+
+                progressReportModel.FilesProcessed.Add(mirroredXmlSrc);
+                progressReportModel.EstimatedTimeInSecounds = (int)((HowMuchThereIs - Output.Count) * watch.Elapsed.TotalMilliseconds * 0.001);
+                progressReportModel.PercentageComplete = (Output.Count * 100) / HowMuchThereIs;
+                progress.Report(progressReportModel);
+            }));
         }
 
         private List<TxtDefectRow> CreateMirroredDefects(List<string> classes, XmlDocument doc, int frameWidth, int frameHeight, XmlNodeList nodes)

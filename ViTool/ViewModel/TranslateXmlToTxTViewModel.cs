@@ -16,6 +16,7 @@ namespace ViTool.ViewModel
     public class TranslateXmlToTxTViewModel : ViewModelBase
     {
         private IndicatorColors indicatorColors = new IndicatorColors();
+        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
 
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
@@ -45,8 +46,8 @@ namespace ViTool.ViewModel
             }
         }
 
-        private String _TranslateXmlToTxTSrc = "No directory location";
-        public String TranslateXmlToTxTSrc
+        private string _TranslateXmlToTxTSrc = "No directory location";
+        public string TranslateXmlToTxTSrc
         {
             get { return _TranslateXmlToTxTSrc; }
             set
@@ -56,6 +57,51 @@ namespace ViTool.ViewModel
 
                 _TranslateXmlToTxTSrc = value;
                 RaisePropertyChanged(nameof(TranslateXmlToTxTSrc));
+            }
+        }
+
+        private string _Output;
+        public string Output
+        {
+            get { return _Output; }
+            set
+            {
+                if (_Output == value)
+                    return;
+
+                if (value.Length > 2000)
+                    _Output = "";
+                else
+                    _Output = value;
+                RaisePropertyChanged(nameof(Output));
+            }
+        }
+
+        private int _Progress = 0;
+        public int Progress
+        {
+            get { return _Progress; }
+            set
+            {
+                if (_Progress == value)
+                    return;
+
+                _Progress = value;
+                RaisePropertyChanged(nameof(Progress));
+            }
+        }
+
+        private int _EstimatedTime = 0;
+        public int EstimatedTime
+        {
+            get { return _EstimatedTime; }
+            set
+            {
+                if (_EstimatedTime == value)
+                    return;
+
+                _EstimatedTime = value;
+                RaisePropertyChanged(nameof(EstimatedTime));
             }
         }
 
@@ -111,11 +157,16 @@ namespace ViTool.ViewModel
                     _CreateTxtFromXml = new RelayCommand(
                     async () =>
                     {
+                        Output = "";
+                        progress.ProgressChanged += ReportProgress;
+
                         TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
+
                         if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
                         {
-                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList()));
+                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList(), progress));
+                            
                             if (result)
                                 TranslateXmlToTxTInfoBrush = indicatorColors.doneColor;
                             else
@@ -124,7 +175,7 @@ namespace ViTool.ViewModel
                         else
                         {
                             TranslateXmlToTxTInfoBrush = indicatorColors.errorColor;
-                            TranslateXmlToTxT.Output = "There is no files";
+                            Output += "There is no files";
                         }
                     },
                     () =>
@@ -147,7 +198,7 @@ namespace ViTool.ViewModel
                     _AddClass = new RelayCommand(
                     () =>
                     {
-                        if (NewClass != null && NewClass != "") 
+                        if (NewClass != null && NewClass != "")
                         {
                             ListOfClasses.Add(NewClass);
                             NewClass = "";
@@ -207,8 +258,27 @@ namespace ViTool.ViewModel
             }
         }
 
+        private void ReportProgress(object sender, ProgressReportModel e)
+        {
+            if (e.ErrorMessage != "")
+            {
+                Output += e.ErrorMessage;
+                EstimatedTime = 0;
+                Progress = 0;
+                return;
+            }
 
-        string selectPath(string startingDir, string description)
+            foreach (string line in e.FilesProcessed)
+                Output += line + "\n";
+
+            if (e.InfoMessage != "")
+                Output +=e.InfoMessage;
+
+            Progress = e.PercentageComplete;
+            EstimatedTime = e.EstimatedTimeInSecounds;
+        }
+
+        private string selectPath(string startingDir, string description)
         {
             FolderBrowserDialog folderDlg = new FolderBrowserDialog();
             folderDlg.Description = description;

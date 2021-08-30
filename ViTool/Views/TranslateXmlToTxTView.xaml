@@ -26,15 +26,15 @@
         <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding TranslateXmlToTxTSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
 
         <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
-            <TextBlock Text="{Binding TranslateXmlToTxT.Output}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding Output}" HorizontalAlignment="Center"/>
         </ScrollViewer>
 
         <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
-            <TextBlock  Text="{Binding TranslateXmlToTxT.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+            <TextBlock  Text="{Binding Progress ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
         </Border>
 
         <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
-            <TextBlock Text="{Binding TranslateXmlToTxT.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
+            <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
         </Border>
 
         <Button Content="Create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}" Margin="5"/>

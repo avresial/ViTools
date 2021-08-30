@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -114,8 +115,8 @@ namespace ViTool.Models
                 return false;
             }
 
-            ProcessFiles(files, mirroredImgDirectory, imgExt, xmlExt);
-
+            //ProcessFiles(files, mirroredImgDirectory);
+            await ProcessFilesParalelAsync(files, mirroredImgDirectory);
             Output = operationFinished;
             IsRunning = false;
             return true;
@@ -142,19 +143,39 @@ namespace ViTool.Models
             return mirroredImgDirectory;
         }
 
-        void ProcessFiles(string[] imgFiles, string mirroredImgDirectory, string imgExt, string xmlExt)
+        void ProcessFiles(string[] files, string mirroredImgDirectory)
         {
-            foreach (string imgSrc in imgFiles)
+            foreach (string src in files)
             {
-                if (Path.GetExtension(imgSrc) == xmlExt)
-                    SaveXml(imgSrc, mirroredImgDirectory, xmlExt, FlipXml(imgSrc));
+                if (Path.GetExtension(src) == xmlExt)
+                    SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
 
-                if (Path.GetExtension(imgSrc) == imgExt)
+                if (Path.GetExtension(src) == imgExt)
                 {
-                    SaveImg(imgSrc, mirroredImgDirectory, imgExt, FlipImg(imgSrc));
+                    SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
                     HowMuchLeft--;
                 }
             }
+        }
+
+        async Task ProcessFilesParalelAsync(string[] files, string mirroredImgDirectory)
+        {
+            int procesorsCount = Environment.ProcessorCount;
+
+            if (procesorsCount >= 4)
+                procesorsCount -= 2;
+
+            await Task.Run(() => Parallel.ForEach<string>(files, new ParallelOptions { MaxDegreeOfParallelism = procesorsCount }, src =>
+              {
+                  if (Path.GetExtension(src) == xmlExt)
+                      SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
+
+                  if (Path.GetExtension(src) == imgExt)
+                  {
+                      SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
+                      HowMuchLeft--;
+                  }
+              }));
         }
 
         XmlDocument FlipXml(string imgSrc)

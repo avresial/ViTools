@@ -85,6 +85,7 @@
     </ApplicationDefinition>
     <Compile Include="Models\IndicatorColors.cs" />
     <Compile Include="Models\MirrorAlgorithm.cs" />
+    <Compile Include="Models\ProgressReportModel.cs" />
     <Compile Include="Models\TranslateXmlToTxTAlgorithm.cs" />
     <Compile Include="Models\TxtDefectRow.cs" />
     <Compile Include="ViewModel\MainPanelViewModel.cs" />
