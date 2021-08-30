@@ -2,6 +2,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -10,6 +11,13 @@ namespace ViTool.Models
 {
     public class MirrorAlgorithm : ViewModelBase
     {
+        private const string imgExt = ".jpg";
+        private const string xmlExt = ".xml";
+
+        private string noValidFiles = "No valid files in given Directory";
+        private string operationFinished = "Operation Finished";
+        private string noValidDirectory = "No Valid Directory";
+
         private int _MaxOutputLines = 20000;
         public int MaxOutputLines
         {
@@ -88,48 +96,50 @@ namespace ViTool.Models
             HowMuchLeft = 0;
             HowMuchThereIs = 0;
 
-            string mirroredImgDirectory;
-            string imgExt = ".jpg";
-            string xmlExt = ".xml";
-            string imgDirectory;
-            string[] imgFiles;
+            string[] files;
+            string mirroredImgDirectory = CreateMirroredImgDirectory(directory);
 
-            imgDirectory = directory;
+            if (mirroredImgDirectory == null || mirroredImgDirectory == "")
+                return false;
 
-            if (imgDirectory == null || imgDirectory == "")
+            files = Directory.GetFiles(directory);
+
+            HowMuchThereIs = files.Where(x => x.Contains(imgExt)).Count();
+            HowMuchLeft = HowMuchThereIs;
+
+            if (HowMuchThereIs == 0)
             {
-                Output = "No valid Directory";
+                Output = noValidFiles;
                 IsRunning = false;
                 return false;
             }
 
-            mirroredImgDirectory = Path.Combine(Path.GetFullPath(Path.Combine(imgDirectory, @"..\")), Path.GetFileName(imgDirectory) + "Mirrored");
+            ProcessFiles(files, mirroredImgDirectory, imgExt, xmlExt);
+
+            Output = operationFinished;
+            IsRunning = false;
+            return true;
+        }
+
+        private string CreateMirroredImgDirectory(string directory)
+        {
+            string mirroredImgDirectory = null;
+
+            if (directory == null || directory == "")
+            {
+                Output = noValidDirectory;
+                IsRunning = false;
+                return null;
+            }
+
+            mirroredImgDirectory = Path.Combine(Path.GetFullPath(Path.Combine(directory, @"..\")), Path.GetFileName(directory) + "Mirrored");
 
             if (Directory.Exists(mirroredImgDirectory))
                 Directory.Delete(mirroredImgDirectory, true);
 
             Directory.CreateDirectory(mirroredImgDirectory);
 
-            imgFiles = Directory.GetFiles(imgDirectory);
-
-            foreach (string fileSrc in imgFiles)
-                if (Path.GetExtension(fileSrc) == imgExt)
-                    HowMuchThereIs++;
-
-            HowMuchLeft = HowMuchThereIs;
-
-            if (HowMuchThereIs == 0)
-            {
-                Output = "No valid files in given Directory";
-                IsRunning = false;
-                return false;
-            }
-
-            ProcessFiles(imgFiles, mirroredImgDirectory, imgExt, xmlExt);
-
-            Output = "Operation Finished";
-            IsRunning = false;
-            return true;
+            return mirroredImgDirectory;
         }
 
         void ProcessFiles(string[] imgFiles, string mirroredImgDirectory, string imgExt, string xmlExt)
