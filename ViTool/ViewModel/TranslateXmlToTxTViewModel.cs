@@ -149,8 +149,11 @@ namespace ViTool.ViewModel
                     _AddClass = new RelayCommand(
                     () =>
                     {
-                        if (NewClass != null && NewClass != "")
+                        if (NewClass != null && NewClass != "") 
+                        {
                             ListOfClasses.Add(NewClass);
+                            NewClass = "";
+                        }
                     },
                     () =>
                     {
@@ -183,6 +186,29 @@ namespace ViTool.ViewModel
                 return _DeleteClass;
             }
         }
+
+        private RelayCommand _Clear;
+        public RelayCommand Clear
+        {
+            get
+            {
+                if (_Clear == null)
+                {
+                    _Clear = new RelayCommand(
+                    () =>
+                    {
+                        ListOfClasses.Clear();
+                    },
+                    () =>
+                    {
+                        return true;
+                    });
+                }
+
+                return _Clear;
+            }
+        }
+
 
         string selectPath(string startingDir, string description)
         {
