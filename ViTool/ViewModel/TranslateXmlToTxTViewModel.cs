@@ -87,8 +87,6 @@ namespace ViTool.ViewModel
             }
         }
 
-
-
         private ObservableCollection<string> _ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
         public ObservableCollection<string> ListOfClasses
         {
