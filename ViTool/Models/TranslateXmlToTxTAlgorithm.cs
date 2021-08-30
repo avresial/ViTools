@@ -106,30 +106,42 @@ namespace ViTool.Models
             List<TxtDefectRow> defects = new List<TxtDefectRow>();
             foreach (XmlNode currentNode in nodes)
             {
-                TxtDefectRow defectRow = new TxtDefectRow();
-
-                int xmin = int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
-                int xmax = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
-                int ymin = int.Parse(currentNode.SelectSingleNode("bndbox/ymin").InnerText);
-                int ymax = int.Parse(currentNode.SelectSingleNode("bndbox/ymax").InnerText);
-
-                defectRow.Left = Math.Round(((double)(xmax + xmin) / 2) / (double)frameWidth, 5);
-                defectRow.Top = Math.Round(((double)(ymax + ymin) / 2) / (double)frameHeight, 5);
-                defectRow.Width = Math.Round((double)(xmax - xmin) / frameWidth, 5);
-                defectRow.Height = Math.Round((double)(ymax - ymin) / frameHeight, 5);
-
-                string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
-
-                defectRow.DefectType = -1;
-                for (int i = 0; i < classes.Count; i++)
-                    if (classes[i] == defectType)
-                        defectRow.DefectType = i;
-
-                if (defectRow.DefectType != -1)
+                TxtDefectRow defectRow =  CreateMirroredDefect(classes, doc, frameWidth, frameHeight, currentNode);
+                if (defectRow != null)
                     defects.Add(defectRow);
             }
+
             return defects;
         }
+
+        private TxtDefectRow CreateMirroredDefect(List<string> classes, XmlDocument doc, int frameWidth, int frameHeight, XmlNode node)
+        {
+            TxtDefectRow defectRow = new TxtDefectRow();
+
+            int xmin = int.Parse(node.SelectSingleNode("bndbox/xmin").InnerText);
+            int xmax = int.Parse(node.SelectSingleNode("bndbox/xmax").InnerText);
+            int ymin = int.Parse(node.SelectSingleNode("bndbox/ymin").InnerText);
+            int ymax = int.Parse(node.SelectSingleNode("bndbox/ymax").InnerText);
+
+            defectRow.Left = Math.Round(((double)(xmax + xmin) / 2) / (double)frameWidth, 5);
+            defectRow.Top = Math.Round(((double)(ymax + ymin) / 2) / (double)frameHeight, 5);
+            defectRow.Width = Math.Round((double)(xmax - xmin) / frameWidth, 5);
+            defectRow.Height = Math.Round((double)(ymax - ymin) / frameHeight, 5);
+
+            string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
+
+            defectRow.DefectType = -1;
+
+            for (int i = 0; i < classes.Count; i++)
+                if (classes[i] == defectType)
+                    defectRow.DefectType = i;
+
+            if (defectRow.DefectType != -1)
+                return defectRow;
+
+            return null;
+        }
+    
 
         void SaveToTxt(List<TxtDefectRow> defectRows, string filename)
         {
