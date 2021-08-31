@@ -17,6 +17,7 @@ namespace ViTool.ViewModel
     {
         private IndicatorColors indicatorColors = new IndicatorColors();
         private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+        int maxOutputLines = 2000;
 
         private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
@@ -69,7 +70,7 @@ namespace ViTool.ViewModel
                 if (_Output == value)
                     return;
 
-                if (value.Length > 2000)
+                if (value.Length > maxOutputLines)
                     _Output = "";
                 else
                     _Output = value;

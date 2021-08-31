@@ -22,9 +22,11 @@
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-
-        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding TranslateXmlToTxTSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
-
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <TextBlock FontWeight="SemiBold" Text="Files directory:" Margin="5,0,5,5" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding TranslateXmlToTxTSrc}" HorizontalAlignment="Left" Margin="5,0,5,5"  VerticalAlignment="Center"/>
+        </StackPanel>
+                
         <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
             <TextBlock Text="{Binding Output}" HorizontalAlignment="Center"/>
         </ScrollViewer>

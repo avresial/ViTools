@@ -17,6 +17,7 @@ namespace ViTool.ViewModel
     {
         private IndicatorColors indicatorColors = new IndicatorColors();
         private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+        int maxOutputLines = 2000;
         public List<double> TimeUsagePerFile { get; set; } = new List<double>();
 
         private MirrorAlgorithm _MirrorAlgorithm = new MirrorAlgorithm();
@@ -56,7 +57,7 @@ namespace ViTool.ViewModel
                 if (_Output == value)
                     return;
 
-                if (value.Length > 2000)
+                if (value.Length > maxOutputLines)
                     _Output = "";
                 else
                     _Output = value;

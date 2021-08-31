@@ -13,6 +13,9 @@ namespace ViTool.Models
     {
         private List<String> Output = new List<string>();
 
+        private string noValidFiles = "No valid files in given Directory";
+        private string operationFinished = "Operation Finished";
+
         private int _HowMuchThereIs;
         public int HowMuchThereIs
         {
@@ -51,7 +54,7 @@ namespace ViTool.Models
 
             progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
             progressReportModel.PercentageComplete = 100;
-            progressReportModel.InfoMessage = "done";
+            progressReportModel.InfoMessage = operationFinished;
             progress.Report(progressReportModel);
 
             IsRunning = false;
