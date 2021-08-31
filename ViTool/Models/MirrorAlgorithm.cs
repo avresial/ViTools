@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Xml;
 
 namespace ViTool.Models
 {
-    public class MirrorAlgorithm : ViewModelBase
+    public class MirrorAlgorithm
     {
         private const string imgExt = ".jpg";
         private const string xmlExt = ".xml";
@@ -19,49 +20,8 @@ namespace ViTool.Models
         private string operationFinished = "Operation Finished";
         private string noValidDirectory = "No Valid Directory";
 
-        private int _MaxOutputLines = 20000;
-        public int MaxOutputLines
-        {
-            get { return _MaxOutputLines; }
-            set
-            {
-                if (_MaxOutputLines == value)
-                    return;
-
-                _MaxOutputLines = value;
-            }
-        }
-
-        private String _Output;
-        public String Output
-        {
-            get { return _Output; }
-            set
-            {
-                if (_Output == value)
-                    return;
-                if (value.Length > _MaxOutputLines)
-                    _Output = "";
-                else
-                    _Output = value;
-                RaisePropertyChanged(nameof(Output));
-            }
-        }
-
-        private int _HowMuchLeft;
-        public int HowMuchLeft
-        {
-            get { return _HowMuchLeft; }
-            set
-            {
-                if (_HowMuchLeft == value)
-                    return;
-
-                _HowMuchLeft = value;
-                RaisePropertyChanged(nameof(HowMuchLeft));
-            }
-        }
-
+        private List<String> Output = new List<string>();
+       
         private int _HowMuchThereIs;
         public int HowMuchThereIs
         {
@@ -72,7 +32,6 @@ namespace ViTool.Models
                     return;
 
                 _HowMuchThereIs = value;
-                RaisePropertyChanged(nameof(HowMuchThereIs));
             }
         }
 
@@ -86,15 +45,14 @@ namespace ViTool.Models
                     return;
 
                 _IsRunning = value;
-                RaisePropertyChanged(nameof(IsRunning));
             }
         }
 
-        public async Task<bool> MirrorImgAsync(string directory)
+        public async Task<bool> MirrorImgAsync(string directory, IProgress<ProgressReportModel> progress)
         {
-            Output = "Loading fles \n";
+            Output.Clear();
+            //Output.Add("Loading fles");
             IsRunning = true;
-            HowMuchLeft = 0;
             HowMuchThereIs = 0;
 
             string[] files;
@@ -106,18 +64,17 @@ namespace ViTool.Models
             files = Directory.GetFiles(directory);
 
             HowMuchThereIs = files.Where(x => x.Contains(imgExt)).Count();
-            HowMuchLeft = HowMuchThereIs;
 
             if (HowMuchThereIs == 0)
             {
-                Output = noValidFiles;
+                Output.Add(noValidFiles);
                 IsRunning = false;
                 return false;
             }
 
             //ProcessFiles(files, mirroredImgDirectory);
-            await ProcessFilesParalelAsync(files, mirroredImgDirectory);
-            Output = operationFinished;
+            await ProcessFilesParalelAsync(files, mirroredImgDirectory, progress);
+            //Output.Add(operationFinished);
             IsRunning = false;
             return true;
         }
@@ -128,7 +85,7 @@ namespace ViTool.Models
 
             if (directory == null || directory == "")
             {
-                Output = noValidDirectory;
+                //Output.Add(noValidDirectory);
                 IsRunning = false;
                 return null;
             }
@@ -153,12 +110,11 @@ namespace ViTool.Models
                 if (Path.GetExtension(src) == imgExt)
                 {
                     SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
-                    HowMuchLeft--;
                 }
             }
         }
 
-        async Task ProcessFilesParalelAsync(string[] files, string mirroredImgDirectory)
+        async Task ProcessFilesParalelAsync(string[] files, string mirroredImgDirectory, IProgress<ProgressReportModel> progress)
         {
             int procesorsCount = Environment.ProcessorCount;
 
@@ -167,14 +123,30 @@ namespace ViTool.Models
 
             await Task.Run(() => Parallel.ForEach<string>(files, new ParallelOptions { MaxDegreeOfParallelism = procesorsCount }, src =>
               {
+                  ProgressReportModel progressReportModel = new ProgressReportModel();
+
+
                   if (Path.GetExtension(src) == xmlExt)
                       SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
 
                   if (Path.GetExtension(src) == imgExt)
                   {
+                      Stopwatch watch = new Stopwatch();
+                      watch.Start();
                       SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
-                      HowMuchLeft--;
+
+                      Output.Add(src);
+
+                      watch.Stop();
+
+                      progressReportModel.FilesProcessed.Add(src);
+                      progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
+                      progressReportModel.PercentageComplete = (Output.Count * 100) / HowMuchThereIs;
+                      progressReportModel.TimeConsumedByProcessedFiles = watch.Elapsed.TotalMilliseconds * 0.001;
+
+                      progress.Report(progressReportModel);
                   }
+
               }));
         }
 
@@ -206,7 +178,7 @@ namespace ViTool.Models
             xmlFilename += "Mirrored" + xmlExt;
             string mirroredXmlSrc = Path.Combine(mirroredImgDirectory, xmlFilename);
             doc.Save(mirroredXmlSrc);
-            Output += "Saveing - " + xmlFilename + "\n";
+            //Output.Add("Saveing - " + xmlFilename);
         }
 
         Bitmap FlipImg(string imgSrc)
@@ -229,7 +201,7 @@ namespace ViTool.Models
 
             string mirroredImgSrc = Path.Combine(mirroredImgDirectory, imgFilename);
             img.Save(mirroredImgSrc);
-            Output += "Saveing - " + imgFilename + "\n";
+            //Output.Add("Saveing - " + imgFilename);
 
         }
 

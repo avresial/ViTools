@@ -95,7 +95,7 @@ namespace ViTool.Models
                 watch.Stop();
 
                 progressReportModel.FilesProcessed.Add(mirroredXmlSrc);
-                progressReportModel.EstimatedTimeInSecounds = (int)((HowMuchThereIs - Output.Count) * watch.Elapsed.TotalMilliseconds * 0.001);
+                progressReportModel.TimeConsumedByProcessedFiles = (int)((HowMuchThereIs - Output.Count) * watch.Elapsed.TotalMilliseconds * 0.001);
                 progressReportModel.PercentageComplete = (Output.Count * 100) / HowMuchThereIs;
                 progress.Report(progressReportModel);
             }));

@@ -275,7 +275,7 @@ namespace ViTool.ViewModel
                 Output +=e.InfoMessage;
 
             Progress = e.PercentageComplete;
-            EstimatedTime = e.EstimatedTimeInSecounds;
+            EstimatedTime = (int)e.TimeConsumedByProcessedFiles;
         }
 
         private string selectPath(string startingDir, string description)
