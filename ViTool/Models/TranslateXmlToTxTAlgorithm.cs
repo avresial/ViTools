@@ -49,7 +49,9 @@ namespace ViTool.Models
 
             await ProcessFilesParalelAsync(directory, xmlExt, classes, files, progress);
 
-            progressReportModel.InfoMessage = "Operation Finished";
+            progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
+            progressReportModel.PercentageComplete = 100;
+            progressReportModel.InfoMessage = "done";
             progress.Report(progressReportModel);
 
             IsRunning = false;

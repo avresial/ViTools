@@ -50,8 +50,10 @@ namespace ViTool.Models
 
         public async Task<bool> MirrorImgAsync(string directory, IProgress<ProgressReportModel> progress)
         {
+            ProgressReportModel progressReportModel = new ProgressReportModel();
             Output.Clear();
-            //Output.Add("Loading fles");
+            progressReportModel.InfoMessage = "Loading fles";
+            progress.Report(progressReportModel);
             IsRunning = true;
             HowMuchThereIs = 0;
 
@@ -67,14 +69,20 @@ namespace ViTool.Models
 
             if (HowMuchThereIs == 0)
             {
-                Output.Add(noValidFiles);
+                progressReportModel.ErrorMessage = noValidFiles;
+                progress.Report(progressReportModel);
                 IsRunning = false;
                 return false;
             }
 
             //ProcessFiles(files, mirroredImgDirectory);
             await ProcessFilesParalelAsync(files, mirroredImgDirectory, progress);
-            //Output.Add(operationFinished);
+
+            progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
+            progressReportModel.PercentageComplete = 100;
+            progressReportModel.InfoMessage = operationFinished;
+            progress.Report(progressReportModel);
+
             IsRunning = false;
             return true;
         }

@@ -106,6 +106,10 @@ namespace ViTool.ViewModel
                 RaisePropertyChanged(nameof(MirrorSrc));
             }
         }
+        public MirrorViewModel()
+        {
+            progress.ProgressChanged += ReportProgress;
+        }
 
         private RelayCommand _MorrorImg;
         public RelayCommand MorrorImg
@@ -121,7 +125,6 @@ namespace ViTool.ViewModel
                         Progress = 0;
                         EstimatedTime = 0;
                         Output = "";
-                        progress.ProgressChanged += ReportProgress;
 
                         MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
                         MirrorAlgorithmBrush = indicatorColors.busyColor;
@@ -165,11 +168,11 @@ namespace ViTool.ViewModel
             foreach (string line in e.FilesProcessed)
                 Output += line + "\n";
             if (e.InfoMessage != "")
-                Output += e.InfoMessage;
+                Output += e.InfoMessage + "\n";
 
             Progress = e.PercentageComplete;
 
-            EstimatedTime = TimeUsagePerFile.Average() * (e.NumberOfAllFilesToProcess - (e.PercentageComplete * e.NumberOfAllFilesToProcess/100));
+            EstimatedTime = TimeUsagePerFile.Average() * (e.NumberOfAllFilesToProcess - (e.PercentageComplete * e.NumberOfAllFilesToProcess / 100));
         }
 
 

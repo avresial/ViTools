@@ -147,6 +147,11 @@ namespace ViTool.ViewModel
             }
         }
 
+        public TranslateXmlToTxTViewModel()
+        {
+            progress.ProgressChanged += ReportProgress;
+        }
+
         private RelayCommand _CreateTxtFromXml;
         public RelayCommand CreateTxtFromXml
         {
@@ -158,8 +163,8 @@ namespace ViTool.ViewModel
                     async () =>
                     {
                         Output = "";
-                        progress.ProgressChanged += ReportProgress;
-
+                        
+                      
                         TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
 
@@ -263,8 +268,7 @@ namespace ViTool.ViewModel
             if (e.ErrorMessage != "")
             {
                 Output += e.ErrorMessage;
-                EstimatedTime = 0;
-                Progress = 0;
+                //EstimatedTime = 0;
                 return;
             }
 
