@@ -150,8 +150,7 @@ namespace ViTool.Models
             return null;
         }
 
-
-        void SaveToTxt(List<TxtDefectRow> defectRows, string filename)
+        private void SaveToTxt(List<TxtDefectRow> defectRows, string filename)
         {
             List<string> lines = new List<string>();
 

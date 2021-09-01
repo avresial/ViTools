@@ -108,20 +108,6 @@ namespace ViTool.Models
             return mirroredImgDirectory;
         }
 
-        void ProcessFiles(string[] files, string mirroredImgDirectory)
-        {
-            foreach (string src in files)
-            {
-                if (Path.GetExtension(src) == xmlExt)
-                    SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
-
-                if (Path.GetExtension(src) == imgExt)
-                {
-                    SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
-                }
-            }
-        }
-
         async Task ProcessFilesParalelAsync(string[] files, string mirroredImgDirectory, IProgress<ProgressReportModel> progress)
         {
             int procesorsCount = Environment.ProcessorCount;
@@ -191,7 +177,6 @@ namespace ViTool.Models
             xmlFilename += "Mirrored" + xmlExt;
             string mirroredXmlSrc = Path.Combine(mirroredImgDirectory, xmlFilename);
             doc.Save(mirroredXmlSrc);
-            //Output.Add("Saveing - " + xmlFilename);
         }
 
         Bitmap FlipImg(string imgSrc)
