@@ -17,12 +17,12 @@ namespace ViTool.ViewModel
     {
         #region Properties
         private int maxOutputLines = 2000;
-        private IndicatorColors indicatorColors = new IndicatorColors();
-        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+        private IndicatorColors indicatorColors;
+        private Progress<ProgressReportModel> progress;
 
-        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; } = new TranslateXmlToTxTAlgorithm();
-        public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; } = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public string TranslateXmlToTxTSrc { get; set; } = "No directory location";
+        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; }
+        public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; }
+        public string TranslateXmlToTxTSrc { get; set; }
 
         private string _Output;
         public string Output
@@ -39,19 +39,30 @@ namespace ViTool.ViewModel
                     _Output = value;
             }
         }
-
-        public int Progress { get; set; } = 0;
-        public int EstimatedTime { get; set; } = 0;
+        /// <summary>
+        /// 0 - 100
+        /// </summary>
+        public int ProgressPercent { get; set; }
+        public int EstimatedTime { get; set; }
         public string SelectedClass { get; set; }
-
         public string NewClass { get; set; }
-        public ObservableCollection<string> ListOfClasses { get; set; } = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+        public ObservableCollection<string> ListOfClasses { get; set; }
 
         #endregion
 
         #region CTOR
-        public TranslateXmlToTxTViewModel()
+        public TranslateXmlToTxTViewModel(TranslateXmlToTxTAlgorithm translateXmlToTxT, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors)
         {
+            this.progress = progress;
+            this.TranslateXmlToTxT = translateXmlToTxT;
+            this.indicatorColors = indicatorColors;
+
+            EstimatedTime = 0;
+            ProgressPercent = 0;
+            TranslateXmlToTxTSrc = "No directory location";
+            TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+            ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+
             progress.ProgressChanged += ReportProgress;
         }
         #endregion
@@ -183,7 +194,7 @@ namespace ViTool.ViewModel
             if (e.InfoMessage != "")
                 Output += e.InfoMessage;
 
-            Progress = e.PercentageComplete;
+            ProgressPercent = e.PercentageComplete;
             EstimatedTime = (int)e.TimeConsumedByProcessedFiles;
         }
 

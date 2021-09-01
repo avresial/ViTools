@@ -113,6 +113,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="IOC\ContainerConfig.cs" />
+    <Compile Include="IOC\Modules\ModelsModule.cs" />
+    <Compile Include="IOC\Modules\ServicesModule.cs" />
     <Compile Include="IOC\Modules\ViewModelsModule.cs" />
     <Compile Include="Models\IndicatorColors.cs" />
     <Compile Include="Models\MirrorAlgorithm.cs" />
