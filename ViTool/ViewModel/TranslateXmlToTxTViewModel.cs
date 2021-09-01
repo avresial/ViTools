@@ -1,11 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using PropertyChanged;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -13,94 +12,51 @@ using ViTool.Models;
 
 namespace ViTool.ViewModel
 {
+    [AddINotifyPropertyChangedInterface]
     public class TranslateXmlToTxTViewModel : ViewModelBase
     {
+        #region Properties
+        private int maxOutputLines = 2000;
         private IndicatorColors indicatorColors = new IndicatorColors();
+        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
 
-        private TranslateXmlToTxTAlgorithm _TranslateXmlToTxT = new TranslateXmlToTxTAlgorithm();
-        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT
+        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; } = new TranslateXmlToTxTAlgorithm();
+        public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; } = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+        public string TranslateXmlToTxTSrc { get; set; } = "No directory location";
+
+        private string _Output;
+        public string Output
         {
-            get { return _TranslateXmlToTxT; }
+            get { return _Output; }
             set
             {
-                if (_TranslateXmlToTxT == value)
+                if (_Output == value)
                     return;
 
-                _TranslateXmlToTxT = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxT));
+                if (value.Length > maxOutputLines)
+                    _Output = "";
+                else
+                    _Output = value;
             }
         }
 
-        private SolidColorBrush _TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public SolidColorBrush TranslateXmlToTxTInfoBrush
+        public int Progress { get; set; } = 0;
+        public int EstimatedTime { get; set; } = 0;
+        public string SelectedClass { get; set; }
+
+        public string NewClass { get; set; }
+        public ObservableCollection<string> ListOfClasses { get; set; } = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+
+        #endregion
+
+        #region CTOR
+        public TranslateXmlToTxTViewModel()
         {
-            get { return _TranslateXmlToTxTInfoBrush; }
-            set
-            {
-                if (_TranslateXmlToTxTInfoBrush == value)
-                    return;
-
-                _TranslateXmlToTxTInfoBrush = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxTInfoBrush));
-            }
+            progress.ProgressChanged += ReportProgress;
         }
+        #endregion
 
-        private String _TranslateXmlToTxTSrc = "No directory location";
-        public String TranslateXmlToTxTSrc
-        {
-            get { return _TranslateXmlToTxTSrc; }
-            set
-            {
-                if (_TranslateXmlToTxTSrc == value)
-                    return;
-
-                _TranslateXmlToTxTSrc = value;
-                RaisePropertyChanged(nameof(TranslateXmlToTxTSrc));
-            }
-        }
-
-        private string _SelectedClass;
-        public string SelectedClass
-        {
-            get { return _SelectedClass; }
-            set
-            {
-                if (_SelectedClass == value)
-                    return;
-
-                _SelectedClass = value;
-                RaisePropertyChanged(nameof(SelectedClass));
-            }
-        }
-
-        private string _NewClass;
-        public string NewClass
-        {
-            get { return _NewClass; }
-            set
-            {
-                if (_NewClass == value)
-                    return;
-
-                _NewClass = value;
-                RaisePropertyChanged(nameof(NewClass));
-            }
-        }
-
-        private ObservableCollection<string> _ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
-        public ObservableCollection<string> ListOfClasses
-        {
-            get { return _ListOfClasses; }
-            set
-            {
-                if (_ListOfClasses == value)
-                    return;
-
-                _ListOfClasses = value;
-                RaisePropertyChanged(nameof(ListOfClasses));
-            }
-        }
-
+        #region Commands
         private RelayCommand _CreateTxtFromXml;
         public RelayCommand CreateTxtFromXml
         {
@@ -111,21 +67,22 @@ namespace ViTool.ViewModel
                     _CreateTxtFromXml = new RelayCommand(
                     async () =>
                     {
-                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
+                        Output = "";
+
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
-                        if (TranslateXmlToTxTSrc != null && TranslateXmlToTxTSrc != "")
-                        {
-                            bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList()));
-                            if (result)
-                                TranslateXmlToTxTInfoBrush = indicatorColors.doneColor;
-                            else
-                                TranslateXmlToTxTInfoBrush = indicatorColors.errorColor;
-                        }
-                        else
+                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
+
+                        if (TranslateXmlToTxTSrc == null || TranslateXmlToTxTSrc == "")
                         {
                             TranslateXmlToTxTInfoBrush = indicatorColors.errorColor;
-                            TranslateXmlToTxT.Output = "There is no files";
+                            Output += "There is no files";
+                            return;
                         }
+
+                        bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList(), progress));
+
+                        TranslateXmlToTxTInfoBrush = result ? indicatorColors.doneColor : indicatorColors.errorColor;
+
                     },
                     () =>
                     {
@@ -147,11 +104,12 @@ namespace ViTool.ViewModel
                     _AddClass = new RelayCommand(
                     () =>
                     {
-                        if (NewClass != null && NewClass != "") 
-                        {
-                            ListOfClasses.Add(NewClass);
-                            NewClass = "";
-                        }
+                        if (NewClass == null || NewClass == "")
+                            return;
+
+                        ListOfClasses.Add(NewClass);
+                        NewClass = "";
+
                     },
                     () =>
                     {
@@ -173,6 +131,9 @@ namespace ViTool.ViewModel
                     _DeleteClass = new RelayCommand(
                     () =>
                     {
+                        if (SelectedClass == null || SelectedClass == "")
+                            return;
+
                         ListOfClasses.Remove(SelectedClass);
                     },
                     () =>
@@ -206,9 +167,27 @@ namespace ViTool.ViewModel
                 return _Clear;
             }
         }
+        #endregion
 
+        private void ReportProgress(object sender, ProgressReportModel e)
+        {
+            if (e.ErrorMessage != "")
+            {
+                Output += e.ErrorMessage;
+                return;
+            }
 
-        string selectPath(string startingDir, string description)
+            foreach (string line in e.FilesProcessed)
+                Output += line + "\n";
+
+            if (e.InfoMessage != "")
+                Output += e.InfoMessage;
+
+            Progress = e.PercentageComplete;
+            EstimatedTime = (int)e.TimeConsumedByProcessedFiles;
+        }
+
+        private string selectPath(string startingDir, string description)
         {
             FolderBrowserDialog folderDlg = new FolderBrowserDialog();
             folderDlg.Description = description;
@@ -217,18 +196,13 @@ namespace ViTool.ViewModel
 
             DialogResult result = folderDlg.ShowDialog();
 
-            if (result == DialogResult.OK)
-            {
-                if (!Directory.Exists(folderDlg.SelectedPath))
-                    return null;
-                return folderDlg.SelectedPath;
-            }
-            else
-            {
+            if (result != DialogResult.OK)
                 return null;
-            }
 
+            if (!Directory.Exists(folderDlg.SelectedPath))
+                return null;
+
+            return folderDlg.SelectedPath;
         }
-
     }
 }

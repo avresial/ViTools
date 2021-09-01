@@ -1,11 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using PropertyChanged;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -13,52 +12,49 @@ using ViTool.Models;
 
 namespace ViTool.ViewModel
 {
+    [AddINotifyPropertyChangedInterface]
     public class MirrorViewModel : ViewModelBase
     {
+        #region Properties
+        int maxOutputLines = 2000;
         private IndicatorColors indicatorColors = new IndicatorColors();
+        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+        public List<double> TimeUsagePerFile { get; set; } = new List<double>();
+        public MirrorAlgorithm MirrorAlgorithm { get; set; } = new MirrorAlgorithm();
+        public SolidColorBrush MirrorAlgorithmBrush { get; set; } = new SolidColorBrush(Color.FromRgb(220, 220, 220));
 
-        private MirrorAlgorithm _MirrorAlgorithm = new MirrorAlgorithm();
-        public MirrorAlgorithm MirrorAlgorithm
+        private string _Output;
+        public string Output
         {
-            get { return _MirrorAlgorithm; }
+            get { return _Output; }
             set
             {
-                if (_MirrorAlgorithm == value)
+                if (_Output == value)
                     return;
 
-                _MirrorAlgorithm = value;
-                RaisePropertyChanged(nameof(MirrorAlgorithm));
+                if (value.Length > maxOutputLines)
+                    _Output = "";
+                else
+                    _Output = value;
             }
         }
 
-        private SolidColorBrush _MirrorAlgorithmBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public SolidColorBrush MirrorAlgorithmBrush
-        {
-            get { return _MirrorAlgorithmBrush; }
-            set
-            {
-                if (_MirrorAlgorithmBrush == value)
-                    return;
+        public int Progress { get; set; } = 0;
+        public double EstimatedTime { get; set; } = 0;
+        public String MirrorSrc { get; set; } = "No directory location";
 
-                _MirrorAlgorithmBrush = value;
-                RaisePropertyChanged(nameof(MirrorAlgorithmBrush));
-            }
+        #endregion
+
+        #region CTOR
+
+        public MirrorViewModel()
+        {
+            progress.ProgressChanged += ReportProgress;
         }
 
+        #endregion
 
-        private String _MirrorSrc = "No directory location";
-        public String MirrorSrc
-        {
-            get { return _MirrorSrc; }
-            set
-            {
-                if (_MirrorSrc == value)
-                    return;
-
-                _MirrorSrc = value;
-                RaisePropertyChanged(nameof(MirrorSrc));
-            }
-        }
+        #region Commands
 
         private RelayCommand _MorrorImg;
         public RelayCommand MorrorImg
@@ -70,23 +66,24 @@ namespace ViTool.ViewModel
                     _MorrorImg = new RelayCommand(
                     async () =>
                     {
-                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
+                        Output = "";
+                        Progress = 0;
+                        EstimatedTime = 0;
+                        TimeUsagePerFile.Clear();
+
                         MirrorAlgorithmBrush = indicatorColors.busyColor;
-                        if (MirrorSrc != null && MirrorSrc != "")
-                        {
-                            bool result = await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc));
+                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
 
-                            if (result)
-                                MirrorAlgorithmBrush = indicatorColors.doneColor;
-                            else
-                                MirrorAlgorithmBrush = indicatorColors.errorColor;
-
-                        }
-                        else
+                        if (MirrorSrc == null || MirrorSrc == "")
                         {
                             MirrorAlgorithmBrush = indicatorColors.errorColor;
-                            MirrorAlgorithm.Output = "There is no files";
+                            Output += "There is no files";
+                            return;
                         }
+
+                        bool result = await Task.Run(() => MirrorAlgorithm.MirrorImgAsync(MirrorSrc, progress));
+                        MirrorAlgorithmBrush = result ? indicatorColors.doneColor : indicatorColors.errorColor;
+
                     },
                     () =>
                     {
@@ -98,9 +95,32 @@ namespace ViTool.ViewModel
             }
         }
 
+        #endregion
 
+        private void ReportProgress(object sender, ProgressReportModel e)
+        {
+            TimeUsagePerFile.Add(e.TimeConsumedByProcessedFiles);
 
-        string selectPath(string startingDir, string description)
+            if (e.ErrorMessage != "")
+            {
+                Output += e.ErrorMessage;
+                EstimatedTime = 0;
+                Progress = 0;
+                return;
+            }
+
+            foreach (string line in e.FilesProcessed)
+                Output += line + "\n";
+
+            if (e.InfoMessage != "")
+                Output += e.InfoMessage + "\n";
+
+            Progress = e.PercentageComplete;
+
+            EstimatedTime = TimeUsagePerFile.Average() * (e.NumberOfAllFilesToProcess - (e.PercentageComplete * e.NumberOfAllFilesToProcess / 100));
+        }
+
+        private string selectPath(string startingDir, string description)
         {
             FolderBrowserDialog folderDlg = new FolderBrowserDialog();
             folderDlg.Description = description;
@@ -109,16 +129,13 @@ namespace ViTool.ViewModel
 
             DialogResult result = folderDlg.ShowDialog();
 
-            if (result == DialogResult.OK)
-            {
-                if (!Directory.Exists(folderDlg.SelectedPath))
-                    return null;
-                return folderDlg.SelectedPath;
-            }
-            else
-            {
+            if (result != DialogResult.OK)
                 return null;
-            }
+
+            if (!Directory.Exists(folderDlg.SelectedPath))
+                return null;
+
+            return folderDlg.SelectedPath;
         }
     }
 }

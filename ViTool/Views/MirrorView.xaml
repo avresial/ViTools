@@ -19,17 +19,19 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-
-        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding MirrorSrc,StringFormat=Files directory - {0}}" HorizontalAlignment="Left" Margin="5,5,5,10"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <TextBlock FontWeight="SemiBold" Text="Files directory:" Margin="5,0,5,5" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding MirrorSrc}" HorizontalAlignment="Left" Margin="5,0,5,5"  VerticalAlignment="Center"/>
+        </StackPanel>
         <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
-            <TextBlock Text="{Binding MirrorAlgorithm.Output}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding Output}" HorizontalAlignment="Center" FontSize="10"/>
         </ScrollViewer>
         <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
-            <TextBlock  Text="{Binding MirrorAlgorithm.HowMuchLeft,StringFormat=That much left - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+            <TextBlock  Text="{Binding Progress, StringFormat=Progress: {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
         </Border>
 
         <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
-            <TextBlock Text="{Binding MirrorAlgorithm.HowMuchThereIs,StringFormat=All records - {0}}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+            <TextBlock Text="{Binding EstimatedTime, StringFormat=Estimated time - {0:N0}s}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
         </Border>
 
         <Button Grid.Row="3" Grid.ColumnSpan="2"  Content="Mirror IMGs" Command="{Binding MorrorImg}" VerticalAlignment="Bottom"  Margin="5,5,5,5"/>
