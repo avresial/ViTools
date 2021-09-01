@@ -36,7 +36,6 @@ namespace ViTool.Models
             IsRunning = true;
             Output.Clear();
             HowMuchThereIs = 0;
-            ProgressReportModel progressReportModel = new ProgressReportModel();
 
             string[] files = Directory.GetFiles(directory);
 
@@ -44,21 +43,25 @@ namespace ViTool.Models
 
             if (HowMuchThereIs == 0)
             {
-                progressReportModel.ErrorMessage = "No valid files in given Directory";
-                progress.Report(progressReportModel);
+                progress.Report(new ProgressReportModel() { ErrorMessage = "No valid files in given Directory" });
                 IsRunning = false;
                 return false;
             }
 
             await ProcessFilesParalelAsync(directory, xmlExt, classes, files, progress);
+            SendProgressReport(progress);
 
+            IsRunning = false;
+            return true;
+        }
+
+        private void SendProgressReport(IProgress<ProgressReportModel> progress)
+        {
+            ProgressReportModel progressReportModel = new ProgressReportModel();
             progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
             progressReportModel.PercentageComplete = 100;
             progressReportModel.InfoMessage = operationFinished;
             progress.Report(progressReportModel);
-
-            IsRunning = false;
-            return true;
         }
 
         private async Task ProcessFilesParalelAsync(string directory, string xmlExt, List<string> classes, string[] files, IProgress<ProgressReportModel> progress)
@@ -111,7 +114,7 @@ namespace ViTool.Models
             List<TxtDefectRow> defects = new List<TxtDefectRow>();
             foreach (XmlNode currentNode in nodes)
             {
-                TxtDefectRow defectRow =  CreateMirroredDefect(classes, doc, frameWidth, frameHeight, currentNode);
+                TxtDefectRow defectRow = CreateMirroredDefect(classes, doc, frameWidth, frameHeight, currentNode);
                 if (defectRow != null)
                     defects.Add(defectRow);
             }
@@ -146,7 +149,7 @@ namespace ViTool.Models
 
             return null;
         }
-    
+
 
         void SaveToTxt(List<TxtDefectRow> defectRows, string filename)
         {

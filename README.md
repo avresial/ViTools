@@ -13,9 +13,9 @@
 
 ## Links you need to know!
 
-- https://github.com/AlexeyAB/darknet
-
 - https://github.com/tzutalin/labelImg
+
+- https://github.com/AlexeyAB/darknet
 
 ## Technologies
 

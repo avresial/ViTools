@@ -131,8 +131,6 @@ namespace ViTool.Models
 
             await Task.Run(() => Parallel.ForEach<string>(files, new ParallelOptions { MaxDegreeOfParallelism = procesorsCount }, src =>
               {
-                  ProgressReportModel progressReportModel = new ProgressReportModel();
-
 
                   if (Path.GetExtension(src) == xmlExt)
                       SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
@@ -147,15 +145,22 @@ namespace ViTool.Models
 
                       watch.Stop();
 
-                      progressReportModel.FilesProcessed.Add(src);
-                      progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
-                      progressReportModel.PercentageComplete = (Output.Count * 100) / HowMuchThereIs;
-                      progressReportModel.TimeConsumedByProcessedFiles = watch.Elapsed.TotalMilliseconds * 0.001;
-
-                      progress.Report(progressReportModel);
+                      SendProgressReport(progress, src, watch);
                   }
 
               }));
+        }
+
+        private void SendProgressReport(IProgress<ProgressReportModel> progress, string src, Stopwatch watch)
+        {
+            ProgressReportModel progressReportModel = new ProgressReportModel();
+
+            progressReportModel.FilesProcessed.Add(src);
+            progressReportModel.NumberOfAllFilesToProcess = HowMuchThereIs;
+            progressReportModel.PercentageComplete = (Output.Count * 100) / HowMuchThereIs;
+            progressReportModel.TimeConsumedByProcessedFiles = watch.Elapsed.TotalMilliseconds * 0.001;
+
+            progress.Report(progressReportModel);
         }
 
         XmlDocument FlipXml(string imgSrc)
