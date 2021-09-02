@@ -13,6 +13,8 @@ namespace ViTool.IOC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<IndicatorColors>().AsSelf();
+            builder.RegisterType<Settings>().AsSelf();
+            
         }
     }
 }

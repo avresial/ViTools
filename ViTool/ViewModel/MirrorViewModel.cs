@@ -21,6 +21,7 @@ namespace ViTool.ViewModel
         private Progress<ProgressReportModel> progress;
         public List<double> TimeUsagePerFile { get; set; }
         public MirrorAlgorithm MirrorAlgorithm { get; set; }
+        public Settings Settings { get; }
         public SolidColorBrush MirrorAlgorithmBrush { get; set; }
 
         private string _Output;
@@ -47,15 +48,17 @@ namespace ViTool.ViewModel
 
         #region CTOR
 
-        public MirrorViewModel(MirrorAlgorithm mirrorAlgorithm, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors)
+        public MirrorViewModel(MirrorAlgorithm mirrorAlgorithm, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors, Settings settings)
         {
             this.progress = progress;
             MirrorAlgorithm = mirrorAlgorithm;
             this.indicatorColors = indicatorColors;
+            Settings = settings;
+            SettingsData settingsData = Settings.ReadSettings();
 
             EstimatedTime = 0;
             ProgressPercent = 0;
-            MirrorSrc = "No directory location";
+            MirrorSrc = settingsData.LastOpenedDirectory;
             TimeUsagePerFile = new List<double>();
             MirrorAlgorithmBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
             progress.ProgressChanged += ReportProgress;
@@ -80,11 +83,14 @@ namespace ViTool.ViewModel
                         EstimatedTime = 0;
                         TimeUsagePerFile.Clear();
 
+                        SettingsData settingsData = Settings.ReadSettings();
+
                         MirrorAlgorithmBrush = indicatorColors.busyColor;
-                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
+                        MirrorSrc = selectPath(settingsData.LastOpenedDirectory, "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
 
                         if (MirrorSrc == null || MirrorSrc == "")
                         {
+                            MirrorSrc = "No Directory";
                             MirrorAlgorithmBrush = indicatorColors.errorColor;
                             Output += "There is no files";
                             return;

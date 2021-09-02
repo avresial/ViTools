@@ -18,8 +18,9 @@ namespace ViTool.ViewModel
         #region Properties
         private int maxOutputLines = 2000;
         private IndicatorColors indicatorColors;
-        private Progress<ProgressReportModel> progress;
+        public Progress<ProgressReportModel> progress;
 
+        private Settings settings;
         public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; }
         public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; }
         public string TranslateXmlToTxTSrc { get; set; }
@@ -51,17 +52,25 @@ namespace ViTool.ViewModel
         #endregion
 
         #region CTOR
-        public TranslateXmlToTxTViewModel(TranslateXmlToTxTAlgorithm translateXmlToTxT, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors)
+        public TranslateXmlToTxTViewModel(TranslateXmlToTxTAlgorithm translateXmlToTxT, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors, Settings settings)
         {
+            this.settings = settings;
             this.progress = progress;
             this.TranslateXmlToTxT = translateXmlToTxT;
             this.indicatorColors = indicatorColors;
 
+            SettingsData currentSettingsData = settings.ReadSettings();
+
             EstimatedTime = 0;
             ProgressPercent = 0;
-            TranslateXmlToTxTSrc = "No directory location";
+            TranslateXmlToTxTSrc = currentSettingsData.LastOpenedDirectory;
             TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-            ListOfClasses = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+            ListOfClasses = new ObservableCollection<string>();
+
+            foreach (string newClass in currentSettingsData.SavedClasses)
+                ListOfClasses.Add(newClass);
+
+                //new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
 
             progress.ProgressChanged += ReportProgress;
         }
@@ -80,11 +89,13 @@ namespace ViTool.ViewModel
                     {
                         Output = "";
 
+                        SettingsData currentSettingsData = settings.ReadSettings();
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
-                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
+                        TranslateXmlToTxTSrc = selectPath(currentSettingsData.LastOpenedDirectory, "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
 
                         if (TranslateXmlToTxTSrc == null || TranslateXmlToTxTSrc == "")
                         {
+                            TranslateXmlToTxTSrc = "No Directory";
                             TranslateXmlToTxTInfoBrush = indicatorColors.errorColor;
                             Output += "There is no files";
                             return;
@@ -93,6 +104,8 @@ namespace ViTool.ViewModel
                         bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList(), progress));
 
                         TranslateXmlToTxTInfoBrush = result ? indicatorColors.doneColor : indicatorColors.errorColor;
+
+                        SaveSettings();
 
                     },
                     () =>
@@ -121,6 +134,7 @@ namespace ViTool.ViewModel
                         ListOfClasses.Add(NewClass);
                         NewClass = "";
 
+                        SaveSettings();
                     },
                     () =>
                     {
@@ -130,6 +144,14 @@ namespace ViTool.ViewModel
 
                 return _AddClass;
             }
+        }
+
+        private void SaveSettings()
+        {
+            SettingsData settingsData = new SettingsData();
+            settingsData.SavedClasses = ListOfClasses.ToList();
+            settingsData.LastOpenedDirectory = TranslateXmlToTxTSrc;
+            settings.SaveSettings(settingsData);
         }
 
         private RelayCommand _DeleteClass;
@@ -146,6 +168,8 @@ namespace ViTool.ViewModel
                             return;
 
                         ListOfClasses.Remove(SelectedClass);
+
+                        SaveSettings();
                     },
                     () =>
                     {
@@ -168,6 +192,11 @@ namespace ViTool.ViewModel
                     () =>
                     {
                         ListOfClasses.Clear();
+
+                        SettingsData settingsData = new SettingsData();
+                        settingsData.SavedClasses = ListOfClasses.ToList();
+                        settingsData.LastOpenedDirectory = TranslateXmlToTxTSrc;
+                        settings.SaveSettings(settingsData);
                     },
                     () =>
                     {
