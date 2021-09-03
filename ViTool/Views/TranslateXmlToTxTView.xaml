@@ -8,11 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="1000">
     <Grid Grid.Column="0">
         <Grid.RowDefinitions>
+            
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-
 
         </Grid.RowDefinitions>
 
@@ -32,7 +32,7 @@
         </ScrollViewer>
 
         <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
-            <TextBlock  Text="{Binding Progress ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+            <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
         </Border>
 
         <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">

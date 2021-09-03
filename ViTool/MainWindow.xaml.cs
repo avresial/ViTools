@@ -21,10 +21,8 @@ namespace ViTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewModel mainViewModel)
         {
-            MainViewModel mainViewModel = new MainViewModel();
-
             InitializeComponent();
             this.DataContext = mainViewModel;
             this.Show();

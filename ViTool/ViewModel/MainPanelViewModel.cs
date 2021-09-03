@@ -11,7 +11,7 @@ namespace ViTool.ViewModel
 {
     public class MainPanelViewModel : ViewModelBase
     {
-        private MirrorViewModel _MirrorViewModel = new MirrorViewModel();
+        private MirrorViewModel _MirrorViewModel;
         public MirrorViewModel MirrorViewModel
         {
             get { return _MirrorViewModel; }
@@ -25,7 +25,7 @@ namespace ViTool.ViewModel
             }
         }
 
-        private TranslateXmlToTxTViewModel _TranslateXmlToTxTViewModel = new TranslateXmlToTxTViewModel();
+        private TranslateXmlToTxTViewModel _TranslateXmlToTxTViewModel;
         public TranslateXmlToTxTViewModel TranslateXmlToTxTViewModel
         {
             get { return _TranslateXmlToTxTViewModel; }
@@ -39,6 +39,10 @@ namespace ViTool.ViewModel
             }
         }
 
-        public MainPanelViewModel() { }
+        public MainPanelViewModel(MirrorViewModel mirrorViewModel, TranslateXmlToTxTViewModel translateXmlToTxTViewModel) 
+        {
+            _MirrorViewModel = mirrorViewModel;
+            _TranslateXmlToTxTViewModel = translateXmlToTxTViewModel;
+        }
     }
 }

@@ -16,12 +16,13 @@ namespace ViTool.ViewModel
     public class MirrorViewModel : ViewModelBase
     {
         #region Properties
-        int maxOutputLines = 2000;
+        private static int maxOutputLines = 2000;
         private IndicatorColors indicatorColors = new IndicatorColors();
-        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
-        public List<double> TimeUsagePerFile { get; set; } = new List<double>();
-        public MirrorAlgorithm MirrorAlgorithm { get; set; } = new MirrorAlgorithm();
-        public SolidColorBrush MirrorAlgorithmBrush { get; set; } = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+        private Progress<ProgressReportModel> progress;
+        public List<double> TimeUsagePerFile { get; set; }
+        public MirrorAlgorithm MirrorAlgorithm { get; set; }
+        public Settings Settings { get; }
+        public SolidColorBrush MirrorAlgorithmBrush { get; set; }
 
         private string _Output;
         public string Output
@@ -39,16 +40,27 @@ namespace ViTool.ViewModel
             }
         }
 
-        public int Progress { get; set; } = 0;
-        public double EstimatedTime { get; set; } = 0;
-        public String MirrorSrc { get; set; } = "No directory location";
+        public int ProgressPercent { get; set; }
+        public double EstimatedTime { get; set; }
+        public String MirrorSrc { get; set; }
 
         #endregion
 
         #region CTOR
 
-        public MirrorViewModel()
+        public MirrorViewModel(MirrorAlgorithm mirrorAlgorithm, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors, Settings settings)
         {
+            this.progress = progress;
+            MirrorAlgorithm = mirrorAlgorithm;
+            this.indicatorColors = indicatorColors;
+            Settings = settings;
+            SettingsData settingsData = Settings.ReadSettings();
+
+            EstimatedTime = 0;
+            ProgressPercent = 0;
+            MirrorSrc = settingsData.LastOpenedDirectory;
+            TimeUsagePerFile = new List<double>();
+            MirrorAlgorithmBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
             progress.ProgressChanged += ReportProgress;
         }
 
@@ -67,15 +79,18 @@ namespace ViTool.ViewModel
                     async () =>
                     {
                         Output = "";
-                        Progress = 0;
+                        ProgressPercent = 0;
                         EstimatedTime = 0;
                         TimeUsagePerFile.Clear();
 
+                        SettingsData settingsData = Settings.ReadSettings();
+
                         MirrorAlgorithmBrush = indicatorColors.busyColor;
-                        MirrorSrc = selectPath("C:\\", "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
+                        MirrorSrc = selectPath(settingsData.LastOpenedDirectory, "Point to folder with dataset (jpg + xml) \nProgram will create folder called 'yourFolderMirrored' next original one.");
 
                         if (MirrorSrc == null || MirrorSrc == "")
                         {
+                            MirrorSrc = "No Directory";
                             MirrorAlgorithmBrush = indicatorColors.errorColor;
                             Output += "There is no files";
                             return;
@@ -105,7 +120,7 @@ namespace ViTool.ViewModel
             {
                 Output += e.ErrorMessage;
                 EstimatedTime = 0;
-                Progress = 0;
+                ProgressPercent = 0;
                 return;
             }
 
@@ -115,7 +130,7 @@ namespace ViTool.ViewModel
             if (e.InfoMessage != "")
                 Output += e.InfoMessage + "\n";
 
-            Progress = e.PercentageComplete;
+            ProgressPercent = e.PercentageComplete;
 
             EstimatedTime = TimeUsagePerFile.Average() * (e.NumberOfAllFilesToProcess - (e.PercentageComplete * e.NumberOfAllFilesToProcess / 100));
         }

@@ -17,12 +17,13 @@ namespace ViTool.ViewModel
     {
         #region Properties
         private int maxOutputLines = 2000;
-        private IndicatorColors indicatorColors = new IndicatorColors();
-        private Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+        private IndicatorColors indicatorColors;
+        public Progress<ProgressReportModel> progress;
 
-        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; } = new TranslateXmlToTxTAlgorithm();
-        public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; } = new SolidColorBrush(Color.FromRgb(220, 220, 220));
-        public string TranslateXmlToTxTSrc { get; set; } = "No directory location";
+        private Settings settings;
+        public TranslateXmlToTxTAlgorithm TranslateXmlToTxT { get; set; }
+        public SolidColorBrush TranslateXmlToTxTInfoBrush { get; set; }
+        public string TranslateXmlToTxTSrc { get; set; }
 
         private string _Output;
         public string Output
@@ -39,19 +40,38 @@ namespace ViTool.ViewModel
                     _Output = value;
             }
         }
-
-        public int Progress { get; set; } = 0;
-        public int EstimatedTime { get; set; } = 0;
+        /// <summary>
+        /// 0 - 100
+        /// </summary>
+        public int ProgressPercent { get; set; }
+        public int EstimatedTime { get; set; }
         public string SelectedClass { get; set; }
-
         public string NewClass { get; set; }
-        public ObservableCollection<string> ListOfClasses { get; set; } = new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+        public ObservableCollection<string> ListOfClasses { get; set; }
 
         #endregion
 
         #region CTOR
-        public TranslateXmlToTxTViewModel()
+        public TranslateXmlToTxTViewModel(TranslateXmlToTxTAlgorithm translateXmlToTxT, Progress<ProgressReportModel> progress, IndicatorColors indicatorColors, Settings settings)
         {
+            this.settings = settings;
+            this.progress = progress;
+            this.TranslateXmlToTxT = translateXmlToTxT;
+            this.indicatorColors = indicatorColors;
+
+            SettingsData currentSettingsData = settings.ReadSettings();
+
+            EstimatedTime = 0;
+            ProgressPercent = 0;
+            TranslateXmlToTxTSrc = currentSettingsData.LastOpenedDirectory;
+            TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+            ListOfClasses = new ObservableCollection<string>();
+
+            foreach (string newClass in currentSettingsData.SavedClasses)
+                ListOfClasses.Add(newClass);
+
+                //new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
+
             progress.ProgressChanged += ReportProgress;
         }
         #endregion
@@ -69,11 +89,13 @@ namespace ViTool.ViewModel
                     {
                         Output = "";
 
+                        SettingsData currentSettingsData = settings.ReadSettings();
                         TranslateXmlToTxTInfoBrush = indicatorColors.busyColor;
-                        TranslateXmlToTxTSrc = selectPath("C:\\", "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
+                        TranslateXmlToTxTSrc = selectPath(currentSettingsData.LastOpenedDirectory, "Point to folder with xml files. \nProgram will create txt files called 'yourFile.txt' next original ones.");
 
                         if (TranslateXmlToTxTSrc == null || TranslateXmlToTxTSrc == "")
                         {
+                            TranslateXmlToTxTSrc = "No Directory";
                             TranslateXmlToTxTInfoBrush = indicatorColors.errorColor;
                             Output += "There is no files";
                             return;
@@ -82,6 +104,8 @@ namespace ViTool.ViewModel
                         bool result = await Task.Run(() => TranslateXmlToTxT.TranslateXmlToTxTAsync(TranslateXmlToTxTSrc, ".xml", ListOfClasses.ToList(), progress));
 
                         TranslateXmlToTxTInfoBrush = result ? indicatorColors.doneColor : indicatorColors.errorColor;
+
+                        SaveSettings();
 
                     },
                     () =>
@@ -110,6 +134,7 @@ namespace ViTool.ViewModel
                         ListOfClasses.Add(NewClass);
                         NewClass = "";
 
+                        SaveSettings();
                     },
                     () =>
                     {
@@ -119,6 +144,14 @@ namespace ViTool.ViewModel
 
                 return _AddClass;
             }
+        }
+
+        private void SaveSettings()
+        {
+            SettingsData settingsData = new SettingsData();
+            settingsData.SavedClasses = ListOfClasses.ToList();
+            settingsData.LastOpenedDirectory = TranslateXmlToTxTSrc;
+            settings.SaveSettings(settingsData);
         }
 
         private RelayCommand _DeleteClass;
@@ -135,6 +168,8 @@ namespace ViTool.ViewModel
                             return;
 
                         ListOfClasses.Remove(SelectedClass);
+
+                        SaveSettings();
                     },
                     () =>
                     {
@@ -157,6 +192,11 @@ namespace ViTool.ViewModel
                     () =>
                     {
                         ListOfClasses.Clear();
+
+                        SettingsData settingsData = new SettingsData();
+                        settingsData.SavedClasses = ListOfClasses.ToList();
+                        settingsData.LastOpenedDirectory = TranslateXmlToTxTSrc;
+                        settings.SaveSettings(settingsData);
                     },
                     () =>
                     {
@@ -183,7 +223,7 @@ namespace ViTool.ViewModel
             if (e.InfoMessage != "")
                 Output += e.InfoMessage;
 
-            Progress = e.PercentageComplete;
+            ProgressPercent = e.PercentageComplete;
             EstimatedTime = (int)e.TimeConsumedByProcessedFiles;
         }
 
