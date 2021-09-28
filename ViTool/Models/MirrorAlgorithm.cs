@@ -21,7 +21,7 @@ namespace ViTool.Models
         private string noValidDirectory = "No Valid Directory";
 
         private List<String> Output = new List<string>();
-       
+
         private int _HowMuchThereIs;
         public int HowMuchThereIs
         {
@@ -116,25 +116,25 @@ namespace ViTool.Models
                 procesorsCount -= 2;
 
             await Task.Run(() => Parallel.ForEach<string>(files, new ParallelOptions { MaxDegreeOfParallelism = procesorsCount }, src =>
-              {
+            {
 
-                  if (Path.GetExtension(src) == xmlExt)
-                      SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
+                if (Path.GetExtension(src) == xmlExt)
+                    SaveXml(src, mirroredImgDirectory, xmlExt, FlipXml(src));
 
-                  if (Path.GetExtension(src) == imgExt)
-                  {
-                      Stopwatch watch = new Stopwatch();
-                      watch.Start();
-                      SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
+                if (Path.GetExtension(src) == imgExt)
+                {
+                    Stopwatch watch = new Stopwatch();
+                    watch.Start();
+                    SaveImg(src, mirroredImgDirectory, imgExt, FlipImg(src));
 
-                      Output.Add(src);
+                    Output.Add(src);
 
-                      watch.Stop();
+                    watch.Stop();
 
-                      SendProgressReport(progress, src, watch);
-                  }
+                    SendProgressReport(progress, src, watch);
+                }
 
-              }));
+            }));
         }
 
         private void SendProgressReport(IProgress<ProgressReportModel> progress, string src, Stopwatch watch)
@@ -159,14 +159,26 @@ namespace ViTool.Models
 
             foreach (XmlNode currentNode in nodes)
             {
-                int newXmin = frameWidth - int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
-                XmlNode node = currentNode.SelectSingleNode("bndbox/xmin");
-                node.InnerText = newXmin.ToString();
+                int oldXmax = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
+                int oldXmin = int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
 
-                int test = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
-                int newXmax = frameWidth - test;
-                XmlNode xmax = currentNode.SelectSingleNode("bndbox/xmax");
-                xmax.InnerText = newXmax.ToString();
+                XmlNode xminNode = currentNode.SelectSingleNode("bndbox/xmin");
+                XmlNode xmaxNode = currentNode.SelectSingleNode("bndbox/xmax");
+
+                int newXmax = frameWidth - oldXmax;
+                int newXmin = frameWidth - oldXmin;
+
+                if (newXmin < newXmax)
+                {
+                    xminNode.InnerText = newXmin.ToString();
+                    xmaxNode.InnerText = newXmax.ToString();
+                }
+                else
+                {
+                    xminNode.InnerText = newXmax.ToString();
+                    xmaxNode.InnerText = newXmin.ToString();
+                }
+
             }
             return doc;
         }
