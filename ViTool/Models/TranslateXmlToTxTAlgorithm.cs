@@ -78,8 +78,7 @@ namespace ViTool.Models
                 watch.Start();
                 ProgressReportModel progressReportModel = new ProgressReportModel();
 
-                if (Path.GetExtension(src) != xmlExt)
-                    return;
+                if (Path.GetExtension(src) != xmlExt) return;
 
                 XmlDocument doc = new XmlDocument();
                 doc.Load(src);
@@ -91,8 +90,7 @@ namespace ViTool.Models
 
                 List<TxtDefectRow> defects = CreateMirroredDefects(classes, doc, frameWidth, frameHeight, nodes);
 
-                if (defects.Count == 0)
-                    return;
+                if (defects.Count == 0) return;
 
                 string xmlFilename = Path.GetFileNameWithoutExtension(src) + ".txt";
                 string mirroredXmlSrc = Path.Combine(directory, xmlFilename);
@@ -115,8 +113,7 @@ namespace ViTool.Models
             foreach (XmlNode currentNode in nodes)
             {
                 TxtDefectRow defectRow = CreateMirroredDefect(classes, doc, frameWidth, frameHeight, currentNode);
-                if (defectRow != null)
-                    defects.Add(defectRow);
+                if (defectRow != null) defects.Add(defectRow);
             }
 
             return defects;
@@ -136,7 +133,7 @@ namespace ViTool.Models
             defectRow.Width = Math.Round((double)(xmax - xmin) / frameWidth, 5);
             defectRow.Height = Math.Round((double)(ymax - ymin) / frameHeight, 5);
 
-            string defectType = doc.DocumentElement.SelectSingleNode("/annotation/object/name").InnerText;
+            string defectType = node.SelectSingleNode("name").InnerText;
 
             defectRow.DefectType = -1;
 
