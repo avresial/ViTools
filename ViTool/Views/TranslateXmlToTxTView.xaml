@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="ViTool.Views.TranslateXmlToTxTView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViTool.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1000">
+    <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+            
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <TextBlock FontWeight="SemiBold" Text="Files directory:" Margin="5,0,5,5" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding TranslateXmlToTxTSrc}" HorizontalAlignment="Left" Margin="5,0,5,5"  VerticalAlignment="Center"/>
+        </StackPanel>
+                
+        <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
+            <TextBlock Text="{Binding Output}" HorizontalAlignment="Center" FontSize="10"/>
+        </ScrollViewer>
+
+        <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+            <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+        </Border>
+
+        <Border BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+            <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
+        </Border>
+
+        <Button Content="Create TXT files" Grid.Row="3" Grid.ColumnSpan="2" Command="{Binding CreateTxtFromXml}" Margin="5"/>
+        
+        <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <TextBlock Text="Classes" VerticalAlignment="Center" />
+            <Button Content="Clear" Command="{Binding Clear}" BorderThickness="0" Background="Transparent" Height="20" Padding="0" Margin="10,0,0,0" FontSize="13" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <ListView Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ListOfClasses}" SelectedItem="{Binding SelectedClass}" />
+
+        <TextBox Grid.Column="2" Grid.Row="2" Text="{Binding NewClass}" TextAlignment="Center" />
+
+        <StackPanel Grid.Column="2" Grid.Row="3" Orientation="Horizontal">
+            <Button Content="Delete" Command="{Binding DeleteClass}" Width="75" Margin="5"/>
+            <Button Content="Add" Command="{Binding AddClass}" Width="75" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

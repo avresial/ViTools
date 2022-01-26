@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="ViTool.Views.MirrorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ViTool.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Grid.Column="1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <TextBlock FontWeight="SemiBold" Text="Files directory:" Margin="5,0,5,5" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding MirrorSrc}" HorizontalAlignment="Left" Margin="5,0,5,5"  VerticalAlignment="Center"/>
+        </StackPanel>
+        <ScrollViewer Grid.Column="0"  Grid.ColumnSpan="2" Grid.Row="1" Margin="5,5,5,5" Background="LightGray">
+            <TextBlock Text="{Binding Output}" HorizontalAlignment="Center" FontSize="10"/>
+        </ScrollViewer>
+        <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="0" Grid.Row="2" Margin="0,5,0,5">
+            <TextBlock  Text="{Binding ProgressPercent, StringFormat=Progress: {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+        </Border>
+
+        <Border BorderBrush="{Binding MirrorAlgorithmBrush}" BorderThickness="0,0,0,3"  Grid.Column="1" Grid.Row="2" Margin="0,5,0,5">
+            <TextBlock Text="{Binding EstimatedTime, StringFormat=Estimated time - {0:N0}s}" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+        </Border>
+
+        <Button Grid.Row="3" Grid.ColumnSpan="2"  Content="Mirror IMGs" Command="{Binding MorrorImg}" VerticalAlignment="Bottom"  Margin="5,5,5,5"/>
+
+    </Grid>
+</UserControl>
