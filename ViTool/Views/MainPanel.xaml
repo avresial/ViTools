@@ -24,11 +24,11 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
-            <Button Content="Load data" Command="{Binding LoadDataRelayCommand}" Margin="5,0,5,5"/>
-            <Button Content="Mirror data" Margin="5,0,5,5" Visibility="Collapsed"/>
-            <Button Content="Convert XML to TXT" Command="{Binding CreateTxtFromXml}" Margin="5,0,5,5"/>
-            <Button Content="Stats" Command="{Binding GetDatasetStatistics}" Margin="5,0,5,5"/>
-            <Button Content="Clear data" Command="{Binding ClearData}" Margin="5,0,5,5"/>
+            <Button Content="Load data" Command="{Binding LoadDataRelayCommand}" Margin="2,0,2,2"/>
+            <Button Content="Mirror data" Visibility="Collapsed" Margin="2,0,2,2"/>
+            <Button Content="Convert XML to TXT" Command="{Binding CreateTxtFromXml}" Margin="2,0,2,2"/>
+            <Button Content="Stats" Command="{Binding GetDatasetStatistics}" Margin="2,0,2,2"/>
+            <Button Content="Clear data" Command="{Binding ClearData}" Margin="2,0,2,2"/>
         </StackPanel>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,0,5,5">
