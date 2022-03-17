@@ -35,7 +35,7 @@
             <TextBlock Text="Directory path:" FontWeight="SemiBold" Margin="5,0,5,5"/>
             <TextBlock Text="{Binding DirectoryPath}" Margin="0,0,5,5"/>
             <TextBlock Text="Files count:" FontWeight="SemiBold" Margin="5,0,5,5"/>
-            <TextBlock Text="{Binding FilesCount}" Margin="0,0,5,5"/>
+            <TextBlock Text="{Binding FilesList.Count}" Margin="0,0,5,5"/>
         </StackPanel>
 
          <ListBox Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5" Background="LightGray" ItemsSource="{Binding FilesList}" 
@@ -45,7 +45,7 @@
             <TextBox Text="{Binding Output}" IsReadOnly="True" Margin="5,5,5,5"/>
         </ScrollViewer>
 
-        <Image Source="{Binding Img}" Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5"/>
+        <Image Source="{Binding ImagePreview}" Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5"/>
 
 
         <StackPanel Grid.Column="3" Grid.Row="0" Orientation="Horizontal">
@@ -62,18 +62,13 @@
             <Button Content="Add" Command="{Binding AddClass}" Width="75" Margin="5"/>
         </StackPanel>
 
-
-
-
         <local:MirrorView Grid.Row="2" DataContext="{Binding MirrorViewModel}" Grid.Column="3" Visibility="Collapsed"/>
-        <local:TranslateXmlToTxTView Grid.Row="2" DataContext="{Binding TranslateXmlToTxTViewModel}" Grid.Column="3" Visibility="Collapsed"/>
-        
-       
-        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="1"  BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
+
+        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="1"  BorderBrush="{Binding ProgressBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
                 <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
             </Border>
 
-        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5" >
+        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" BorderBrush="{Binding ProgressBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5" >
             <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5" />
         </Border>
         

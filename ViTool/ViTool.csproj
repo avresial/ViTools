@@ -119,6 +119,7 @@
     <Compile Include="IOC\Modules\ModelsModule.cs" />
     <Compile Include="IOC\Modules\ServicesModule.cs" />
     <Compile Include="IOC\Modules\ViewModelsModule.cs" />
+    <Compile Include="Models\AdditionalOperations.cs" />
     <Compile Include="Models\IndicatorColors.cs" />
     <Compile Include="Models\MirrorAlgorithm.cs" />
     <Compile Include="Models\ProgressReportModel.cs" />
