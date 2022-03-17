@@ -8,16 +8,44 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto" MinWidth="400"/>
             <ColumnDefinition Width="*" MinWidth="400"/>
+            <ColumnDefinition Width="*" MinWidth="400"/>
         </Grid.ColumnDefinitions>
 
-        <local:MirrorView DataContext="{Binding MirrorViewModel}" />
-        <local:TranslateXmlToTxTView DataContext="{Binding TranslateXmlToTxTViewModel}" Grid.Column="1"/>
+        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+            <Button Content="Load data" Command="{Binding LoadData}" Margin="5,0,5,5"/>
+            <Button Content="Mirror data" Margin="5,0,5,5"/>
+            <Button Content="Create TXT files" Margin="5,0,5,5"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,0,5,5">
+            <TextBlock Text="Directory path:" Margin="5,0,5,5"/>
+            <TextBlock Text="{Binding DirectoryPath}" Margin="5,0,5,5"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="5,5,5,5" Background="LightGray">
+            <ListBox ItemsSource="{Binding FilesList}"  IsSynchronizedWithCurrentItem="True"/>
+        </ScrollViewer>
+
+        <local:MirrorView Grid.Row="2" DataContext="{Binding MirrorViewModel}" Grid.Column="1" />
+        <local:TranslateXmlToTxTView Grid.Row="2" DataContext="{Binding TranslateXmlToTxTViewModel}" Grid.Column="2"/>
+        
+       
+        <Border Grid.Row="3" Grid.Column="0"  BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
+                <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
+            </Border>
+
+        <Border Grid.Row="3" Grid.Column="1" BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
+            <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
+        </Border>
         
     </Grid>
 </UserControl>
