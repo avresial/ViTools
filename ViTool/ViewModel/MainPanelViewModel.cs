@@ -46,7 +46,7 @@ namespace ViTool.ViewModel
                     Output = "";
                     DrawRedRectangle();
                 }
-                else 
+                else
                 {
                     Output = $"Unknown file type - {value}";
                 }
@@ -61,9 +61,6 @@ namespace ViTool.ViewModel
             get { return _Output; }
             set
             {
-                if (_Output == value)
-                    return;
-
                 if (value != "") ImagePreview = null;
 
                 _Output = value;
@@ -166,7 +163,7 @@ namespace ViTool.ViewModel
                             DirectoryPath = SelectPath(DirectoryPath, "Select Directory with jpg and/or xmls");
                             if (DirectoryPath == null || DirectoryPath == "") return;
                             LoadData(DirectoryPath);
-
+                            SaveSettings();
                         },
                     () =>
                     {
