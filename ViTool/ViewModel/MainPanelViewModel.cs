@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,12 +15,27 @@ using ViTool.Models;
 
 namespace ViTool.ViewModel
 {
+
     public class MainPanelViewModel : ViewModelBase
     {
 
         private ObservableCollection<string> _FilesList = new ObservableCollection<string>();
         private IndicatorColors indicatorColors;
         private Settings settings;
+
+        private System.Drawing.Bitmap _Image;
+        public System.Drawing.Bitmap Image
+        {
+            get { return _Image; }
+            set
+            {
+                if (_Image == value)
+                    return;
+
+                _Image = value;
+                RaisePropertyChanged(nameof(Image));
+            }
+        }
 
         public string SelectedClass { get; set; }
         public string NewClass { get; set; }
@@ -44,7 +60,11 @@ namespace ViTool.ViewModel
                 else
                 {
                     Output = "";
-                    Img = new BitmapImage(new Uri(_SelectedFile));
+                    DrawRedRectangle();
+
+
+
+
                 }
 
                 RaisePropertyChanged(nameof(SelectedFile));
@@ -153,12 +173,14 @@ namespace ViTool.ViewModel
             TranslateXmlToTxT = translateXmlToTxT;
             _MirrorViewModel = mirrorViewModel;
             _TranslateXmlToTxTViewModel = translateXmlToTxTViewModel;
-            TranslateXmlToTxTInfoBrush = new SolidColorBrush(Color.FromRgb(220, 220, 220));
+            TranslateXmlToTxTInfoBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 220, 220));
             ListOfClasses = new ObservableCollection<string>();
 
             SettingsData currentSettingsData = settings.ReadSettings();
             DirectoryPath = currentSettingsData.LastOpenedDirectory;
             foreach (string newClass in currentSettingsData.SavedClasses) ListOfClasses.Add(newClass);
+
+
         }
 
         private RelayCommand _LoadDataRelayCommand;
@@ -355,7 +377,7 @@ namespace ViTool.ViewModel
         }
 
 
-        
+
         private string selectPath(string startingDir, string description)
         {
             FolderBrowserDialog folderDlg = new FolderBrowserDialog();
@@ -507,5 +529,65 @@ namespace ViTool.ViewModel
         }
 
 
+        public BitmapImage ToBitmapImage(System.Drawing.Bitmap bitmap)
+        {
+            using (var memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Png);
+                memory.Position = 0;
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+
+                return bitmapImage;
+            }
+        }
+
+        void DrawRedRectangle()
+        {
+            string fileName = Path.GetFileNameWithoutExtension(_SelectedFile) + ".xml";
+
+            Bitmap bitmap = new Bitmap(_SelectedFile);
+
+            if (File.Exists(Path.Combine(DirectoryPath, fileName)))
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(Path.Combine(DirectoryPath, fileName));
+                XmlNodeList nodes = doc.DocumentElement.SelectNodes("/annotation/object");
+
+                Graphics gr = Graphics.FromImage(bitmap);
+                System.Drawing.Color penColor = System.Drawing.Color.Red;
+                System.Drawing.Pen pen = new System.Drawing.Pen(penColor, 5);
+
+                foreach (XmlNode currentNode in nodes)
+                {
+                    int xmin = int.Parse(currentNode.SelectSingleNode("bndbox/xmin").InnerText);
+                    int xmax = int.Parse(currentNode.SelectSingleNode("bndbox/xmax").InnerText);
+                    int ymin = int.Parse(currentNode.SelectSingleNode("bndbox/ymin").InnerText);
+                    int ymax = int.Parse(currentNode.SelectSingleNode("bndbox/ymax").InnerText);
+
+                    
+                    Rectangle rectangle = new Rectangle();
+                    rectangle.X = xmin;
+                    rectangle.Y = ymin;
+                    rectangle.Width = xmax - xmin;
+                    rectangle.Height = ymax - ymin;
+
+                    string defectType = currentNode.SelectSingleNode("name").InnerText;
+                    gr.DrawRectangle(pen, rectangle);
+                    gr.DrawString(s: defectType + ":    " , font: new Font(new Font("Times New Roman", 12.0f),
+                        FontStyle.Bold), brush: new SolidBrush(pen.Color), point: new Point(rectangle.X, rectangle.Y + 25));
+
+                }
+
+                ;
+            }
+            Img = ToBitmapImage(bitmap);
+
+        }
     }
 }
