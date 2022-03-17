@@ -11,6 +11,21 @@ namespace ViTool.ViewModel
 {
     public class MainPanelViewModel : ViewModelBase
     {
+        private string _DirectoryPath;
+        public string DirectoryPath
+        {
+            get { return _DirectoryPath; }
+            set
+            {
+                if (_DirectoryPath == value)
+                    return;
+
+                _DirectoryPath = value;
+                RaisePropertyChanged(nameof(DirectoryPath));
+            }
+        }
+
+
         private MirrorViewModel _MirrorViewModel;
         public MirrorViewModel MirrorViewModel
         {
