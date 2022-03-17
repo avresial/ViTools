@@ -14,12 +14,13 @@ namespace ViTool.Models
 
         public static YoloObjectCounter CountDefects(string directoryWithXMLs)
         {
+            if (directoryWithXMLs == null || directoryWithXMLs == "") new YoloObjectCounter();
             YoloObjectCounter yoloObjectCounter = new YoloObjectCounter();
 
             DirectoryInfo d = new DirectoryInfo(directoryWithXMLs);
             FileInfo[] files = d.GetFiles("*.xml");
-            foreach (FileInfo file in files)
-                yoloObjectCounter.AddCounters(CountDefectsOnSingleFile(file.FullName));
+            
+            foreach (FileInfo file in files)yoloObjectCounter.AddCounters(CountDefectsOnSingleFile(file.FullName));
 
             return yoloObjectCounter;
         }
@@ -54,10 +55,11 @@ namespace ViTool.Models
 
         public static void DeleteObjectsWithNoDefects(string path)
         {
+            if (path == null || path == "") return;
+
             DirectoryInfo d = new DirectoryInfo(path);
             FileInfo[] files = d.GetFiles();
-            foreach (FileInfo file in files)
-                DeleteObject(file.FullName);
+            foreach (FileInfo file in files) DeleteObject(file.FullName);
         }
         private static void DeleteObject(string xmlPath)
         {
@@ -125,7 +127,7 @@ namespace ViTool.Models
                 bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Jpeg);
                 memory.Position = 0;
 
-                var bitmapImage = new BitmapImage();
+                BitmapImage bitmapImage = new BitmapImage();
                 bitmapImage.BeginInit();
                 bitmapImage.StreamSource = memory;
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;

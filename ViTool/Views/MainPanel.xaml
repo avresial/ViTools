@@ -26,7 +26,7 @@
         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
             <Button Content="Load data" Command="{Binding LoadDataRelayCommand}" Margin="5,0,5,5"/>
             <Button Content="Mirror data" Margin="5,0,5,5" Visibility="Collapsed"/>
-            <Button Content="Create TXT files" Command="{Binding CreateTxtFromXml}" Margin="5,0,5,5"/>
+            <Button Content="Convert XML to TXT" Command="{Binding CreateTxtFromXml}" Margin="5,0,5,5"/>
             <Button Content="Stats" Command="{Binding GetDatasetStatistics}" Margin="5,0,5,5"/>
             <Button Content="Clear data" Command="{Binding ClearData}" Margin="5,0,5,5"/>
         </StackPanel>
@@ -68,7 +68,7 @@
                 <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
             </Border>
 
-        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" BorderBrush="{Binding ProgressBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5" >
+        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" BorderBrush="{Binding ProgressBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5" >
             <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5" />
         </Border>
         

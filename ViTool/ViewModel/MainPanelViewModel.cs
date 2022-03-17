@@ -36,20 +36,19 @@ namespace ViTool.ViewModel
                     return;
 
                 _SelectedFile = Path.Combine(DirectoryPath, value);
-                if (Path.GetExtension(_SelectedFile) == ".txt" || Path.GetExtension(_SelectedFile) == ".xml")
+                if (Path.GetExtension(_SelectedFile) == ".txt" || Path.GetExtension(_SelectedFile) == ".xml" || Path.GetExtension(_SelectedFile).Contains("names"))
                 {
-                    var OpenFile = new System.IO.StreamReader(_SelectedFile);
+                    StreamReader OpenFile = new StreamReader(_SelectedFile);
                     Output = OpenFile.ReadToEnd();
-
                 }
-                else
+                else if (Path.GetExtension(_SelectedFile) == ".jpg" || Path.GetExtension(_SelectedFile) == ".png")
                 {
                     Output = "";
                     DrawRedRectangle();
-
-
-
-
+                }
+                else 
+                {
+                    Output = $"Unknown file type - {value}";
                 }
 
                 RaisePropertyChanged(nameof(SelectedFile));
@@ -77,14 +76,14 @@ namespace ViTool.ViewModel
             get { return _DirectoryPath; }
             set
             {
-                if (_DirectoryPath == value)
-                    return;
+                if (_DirectoryPath == value) return;
+
+                if (value == null || value == "") FilesList.Clear();
 
                 _DirectoryPath = value;
                 RaisePropertyChanged(nameof(DirectoryPath));
             }
         }
-
 
         public int ProgressPercent { get; set; }
         public int EstimatedTime { get; set; }
@@ -148,6 +147,8 @@ namespace ViTool.ViewModel
 
             SettingsData currentSettingsData = settings.ReadSettings();
             DirectoryPath = currentSettingsData.LastOpenedDirectory;
+            if (DirectoryPath != null && DirectoryPath != "") LoadData(DirectoryPath);
+
             foreach (string newClass in currentSettingsData.SavedClasses) ListOfClasses.Add(newClass);
         }
 
@@ -164,7 +165,7 @@ namespace ViTool.ViewModel
                         {
                             DirectoryPath = SelectPath(DirectoryPath, "Select Directory with jpg and/or xmls");
                             if (DirectoryPath == null || DirectoryPath == "") return;
-                            LoadData();
+                            LoadData(DirectoryPath);
 
                         },
                     () =>
@@ -205,10 +206,12 @@ namespace ViTool.ViewModel
                         ProgressBrush = result ? indicatorColors.doneColor : indicatorColors.errorColor;
 
                         SaveSettings();
-                        LoadData();
+                        LoadData(DirectoryPath);
                     },
                     () =>
                     {
+                        if (DirectoryPath == null || DirectoryPath == "") return false;
+                        if (ListOfClasses.Count == 0) return false;
                         return !TranslateXmlToTxT.IsRunning;
                     });
                 }
@@ -308,6 +311,7 @@ namespace ViTool.ViewModel
                     },
                     () =>
                     {
+                        if (DirectoryPath == null || DirectoryPath == "") return false;
                         return true;
                     });
                 }
@@ -327,10 +331,11 @@ namespace ViTool.ViewModel
                     () =>
                     {
                         AdditionalOperations.DeleteObjectsWithNoDefects(DirectoryPath);
-                        LoadData();
+                        LoadData(DirectoryPath);
                     },
                     () =>
                     {
+                        if (DirectoryPath == null || DirectoryPath == "") return false;
                         return true;
                     });
                 }
@@ -363,15 +368,27 @@ namespace ViTool.ViewModel
             settingsData.LastOpenedDirectory = DirectoryPath;
             settings.SaveSettings(settingsData);
         }
-        private void LoadData()
+        private void LoadData(string directory)
         {
             Output = "";
             FilesList.Clear();
 
-            DirectoryInfo d = new DirectoryInfo(DirectoryPath);
+            DirectoryInfo d = new DirectoryInfo(directory);
 
             FileInfo[] Files = d.GetFiles();
-            foreach (FileInfo file in Files) FilesList.Add(file.Name);
+            foreach (FileInfo file in Files)
+            {
+                if (Path.GetExtension(file.FullName).Contains("names"))
+                {
+                    ListOfClasses.Clear();
+                    string[] logFile = File.ReadAllLines(file.FullName);
+
+                    foreach (string yoloClass in new List<string>(logFile)) ListOfClasses.Add(yoloClass);
+                }
+                FilesList.Add(file.Name);
+            }
+
+
         }
 
         private void DrawRedRectangle()
@@ -379,9 +396,13 @@ namespace ViTool.ViewModel
             string fileName = Path.GetFileNameWithoutExtension(_SelectedFile) + ".xml";
 
             Bitmap bitmap = new Bitmap(_SelectedFile);
+            string xmlFile = Path.Combine(DirectoryPath, fileName);
 
-            if (File.Exists(Path.Combine(DirectoryPath, fileName)))
+            if (File.Exists(xmlFile))
             {
+                StreamReader OpenFile = new StreamReader(xmlFile);
+                Output = OpenFile.ReadToEnd();
+
                 XmlDocument doc = new XmlDocument();
                 doc.Load(Path.Combine(DirectoryPath, fileName));
                 XmlNodeList nodes = doc.DocumentElement.SelectNodes("/annotation/object");
@@ -411,6 +432,10 @@ namespace ViTool.ViewModel
 
                 }
                 gr.Dispose();
+            }
+            else
+            {
+                Output = $"No XML available at src {xmlFile}";
             }
 
             ImagePreview = AdditionalOperations.ToBitmapImage(bitmap);
