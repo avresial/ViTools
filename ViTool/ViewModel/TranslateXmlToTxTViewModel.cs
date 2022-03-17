@@ -70,8 +70,6 @@ namespace ViTool.ViewModel
             foreach (string newClass in currentSettingsData.SavedClasses)
                 ListOfClasses.Add(newClass);
 
-                //new ObservableCollection<string>() { "HCH", "LowFreqAnomaly", "Imprint", "Break", "ChippedBreak" };
-
             progress.ProgressChanged += ReportProgress;
         }
         #endregion

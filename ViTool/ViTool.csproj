@@ -126,6 +126,7 @@
     <Compile Include="Models\SettingsData.cs" />
     <Compile Include="Models\TranslateXmlToTxTAlgorithm.cs" />
     <Compile Include="Models\TxtDefectRow.cs" />
+    <Compile Include="Models\YoloObjectCounter.cs" />
     <Compile Include="ViewModel\MainPanelViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MirrorViewModel.cs" />

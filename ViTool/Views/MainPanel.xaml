@@ -12,39 +12,68 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" MinWidth="400"/>
-            <ColumnDefinition Width="*" MinWidth="400"/>
-            <ColumnDefinition Width="*" MinWidth="400"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
-            <Button Content="Load data" Command="{Binding LoadData}" Margin="5,0,5,5"/>
-            <Button Content="Mirror data" Margin="5,0,5,5"/>
-            <Button Content="Create TXT files" Margin="5,0,5,5"/>
+            <Button Content="Load data" Command="{Binding LoadDataRelayCommand}" Margin="5,0,5,5"/>
+            <Button Content="Mirror data" Margin="5,0,5,5" Visibility="Collapsed"/>
+            <Button Content="Create TXT files" Command="{Binding CreateTxtFromXml}" Margin="5,0,5,5"/>
+            <Button Content="Stats" Command="{Binding GetDatasetStatistics}" Margin="5,0,5,5"/>
+            <Button Content="Clear data" Command="{Binding ClearData}" Margin="5,0,5,5"/>
         </StackPanel>
-
+        
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5,0,5,5">
-            <TextBlock Text="Directory path:" Margin="5,0,5,5"/>
+            <TextBlock Text="Directory path:" FontWeight="SemiBold" Margin="5,0,5,5"/>
             <TextBlock Text="{Binding DirectoryPath}" Margin="5,0,5,5"/>
+            <TextBlock Text="Files count:" FontWeight="SemiBold" Margin="5,0,5,5"/>
+            <TextBlock Text="{Binding FilesCount}" Margin="5,0,5,5"/>
         </StackPanel>
 
-        <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="5,5,5,5" Background="LightGray">
-            <ListBox ItemsSource="{Binding FilesList}"  IsSynchronizedWithCurrentItem="True"/>
+         <ListBox Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5" Background="LightGray" ItemsSource="{Binding FilesList}" 
+                  SelectedItem="{Binding SelectedFile}" IsSynchronizedWithCurrentItem="True" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+        
+        <ScrollViewer Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5" Background="LightGray">
+            <TextBox Text="{Binding Output}" IsReadOnly="True" Margin="5,5,5,5"/>
         </ScrollViewer>
 
-        <local:MirrorView Grid.Row="2" DataContext="{Binding MirrorViewModel}" Grid.Column="1" />
-        <local:TranslateXmlToTxTView Grid.Row="2" DataContext="{Binding TranslateXmlToTxTViewModel}" Grid.Column="2"/>
+        <Image Source="{Binding Img}" Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Margin="5,5,5,5"/>
+
+        <StackPanel Grid.Column="3" Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="Classes" VerticalAlignment="Center" />
+            <Button Content="Clear" Command="{Binding Clear}" BorderThickness="0" Background="Transparent" Height="20" Padding="0" Margin="10,0,0,0" FontSize="13" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <ListView Grid.Column="3" Grid.Row="2" ItemsSource="{Binding ListOfClasses}" SelectedItem="{Binding SelectedClass}" />
+
+        <TextBox Grid.Column="3" Grid.Row="3" Text="{Binding NewClass}" TextAlignment="Center" />
+
+        <StackPanel Grid.Column="3" Grid.Row="4" Orientation="Horizontal">
+            <Button Content="Delete" Command="{Binding DeleteClass}" Width="75" Margin="5"/>
+            <Button Content="Add" Command="{Binding AddClass}" Width="75" Margin="5"/>
+        </StackPanel>
+
+
+
+
+        <local:MirrorView Grid.Row="2" DataContext="{Binding MirrorViewModel}" Grid.Column="3" Visibility="Collapsed"/>
+        <local:TranslateXmlToTxTView Grid.Row="2" DataContext="{Binding TranslateXmlToTxTViewModel}" Grid.Column="3" Visibility="Collapsed"/>
         
        
-        <Border Grid.Row="3" Grid.Column="0"  BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
+        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="1"  BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
                 <TextBlock  Text="{Binding ProgressPercent ,StringFormat=Progress:  {0}%}" HorizontalAlignment="Center" Margin="0,5,0,5" />
             </Border>
 
-        <Border Grid.Row="3" Grid.Column="1" BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5">
-            <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5"/>
+        <Border Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" BorderBrush="{Binding TranslateXmlToTxTInfoBrush}" BorderThickness="0,0,0,3" Margin="0,5,0,5" >
+            <TextBlock Text="{Binding EstimatedTime ,StringFormat=Estimated time - {0}s}" HorizontalAlignment="Center"  Margin="0,5,0,5" />
         </Border>
         
     </Grid>
