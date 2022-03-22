@@ -19,7 +19,7 @@ namespace ViTool.ViewModel
     public class MainPanelViewModel : ViewModelBase
     {
 
-        private ObservableCollection<string> _FilesList = new ObservableCollection<string>();
+       
         private IndicatorColors indicatorColors;
         private Settings settings;
 
@@ -39,7 +39,8 @@ namespace ViTool.ViewModel
                 if (Path.GetExtension(_SelectedFile) == ".txt" || Path.GetExtension(_SelectedFile) == ".xml" || Path.GetExtension(_SelectedFile).Contains("names"))
                 {
                     StreamReader OpenFile = new StreamReader(_SelectedFile);
-                    Output = OpenFile.ReadToEnd();
+                    string otput = OpenFile.ReadToEnd();
+                    Output = otput;
                 }
                 else if (Path.GetExtension(_SelectedFile) == ".jpg" || Path.GetExtension(_SelectedFile) == ".png")
                 {
@@ -85,7 +86,7 @@ namespace ViTool.ViewModel
         public int ProgressPercent { get; set; }
         public int EstimatedTime { get; set; }
 
-
+        private ObservableCollection<string> _FilesList = new ObservableCollection<string>();
         public ObservableCollection<string> FilesList
         {
             get { return _FilesList; }
@@ -144,9 +145,10 @@ namespace ViTool.ViewModel
 
             SettingsData currentSettingsData = settings.ReadSettings();
             DirectoryPath = currentSettingsData.LastOpenedDirectory;
-            if (DirectoryPath != null && DirectoryPath != "") LoadData(DirectoryPath);
 
             foreach (string newClass in currentSettingsData.SavedClasses) ListOfClasses.Add(newClass);
+            if (DirectoryPath != null && DirectoryPath != "" && DirectoryPath != "No Directory") LoadData(DirectoryPath);
+
         }
 
 
@@ -371,18 +373,26 @@ namespace ViTool.ViewModel
             FilesList.Clear();
 
             DirectoryInfo d = new DirectoryInfo(directory);
-
-            FileInfo[] Files = d.GetFiles();
-            foreach (FileInfo file in Files)
+            try
             {
-                if (Path.GetExtension(file.FullName).Contains("names"))
+                FileInfo[] Files = d.GetFiles();
+                foreach (FileInfo file in Files)
                 {
-                    ListOfClasses.Clear();
-                    string[] logFile = File.ReadAllLines(file.FullName);
+                    if (Path.GetExtension(file.FullName).Contains("names"))
+                    {
+                        ListOfClasses.Clear();
+                        string[] logFile = File.ReadAllLines(file.FullName);
 
-                    foreach (string yoloClass in new List<string>(logFile)) ListOfClasses.Add(yoloClass);
+                        foreach (string yoloClass in new List<string>(logFile)) ListOfClasses.Add(yoloClass);
+                    }
+                    FilesList.Add(file.Name);
                 }
-                FilesList.Add(file.Name);
+
+            }
+            catch (Exception ex)
+            {
+
+                Output = ex.Message;
             }
 
 
@@ -390,10 +400,67 @@ namespace ViTool.ViewModel
 
         private void DrawRedRectangle()
         {
-            string fileName = Path.GetFileNameWithoutExtension(_SelectedFile) + ".xml";
+            string TXTfileName = Path.GetFileNameWithoutExtension(_SelectedFile) + ".txt";
+            string TXTFile = Path.Combine(DirectoryPath, TXTfileName);
+            if (File.Exists(TXTFile))
+            {
+                DrawRectangleFromTxtFile(TXTFile);
+                return;
+            }
 
+            string XMLfileName = Path.GetFileNameWithoutExtension(_SelectedFile) + ".xml";
+            string xmlFile = Path.Combine(DirectoryPath, XMLfileName);
+            if (File.Exists(xmlFile))
+            {
+                DrawRectangleFromXmlFile(XMLfileName, xmlFile);
+                return;
+            }
+
+        }
+
+        private void DrawRectangleFromTxtFile(string TXTFilePath)
+        {
             Bitmap bitmap = new Bitmap(_SelectedFile);
-            string xmlFile = Path.Combine(DirectoryPath, fileName);
+
+            var logFile = File.ReadAllLines(TXTFilePath);
+            List<string> logList = new List<string>(logFile);
+
+            Graphics gr = Graphics.FromImage(bitmap);
+            System.Drawing.Color penColor = System.Drawing.Color.Red;
+            System.Drawing.Pen pen = new System.Drawing.Pen(penColor, 5);
+
+            foreach (string defect in logList)
+            {
+                if (defect == null || defect == "") continue;
+                // [class numer] [Left] [Top] [Width] [Height]
+                Rectangle rectangle = new Rectangle();
+
+
+                string[] defectsData = defect.Split(' ');
+                int defectIndex = int.Parse(defectsData[0]);
+                string defectName = ListOfClasses[defectIndex];
+
+                rectangle.X = (int)(double.Parse(defectsData[1]) * bitmap.Width);
+                rectangle.Y = (int)(double.Parse(defectsData[2]) * bitmap.Height);
+
+                rectangle.Width = (int)(double.Parse(defectsData[3]) * bitmap.Width);
+                rectangle.Height = (int)(double.Parse(defectsData[4]) * bitmap.Height);
+
+
+                gr.DrawRectangle(pen, rectangle);
+                gr.DrawString(s: defectName + ":    ", font: new Font(new Font("Times New Roman", 15.0f),
+                    FontStyle.Bold), brush: new SolidBrush(pen.Color), point: new Point(rectangle.X, rectangle.Y + 25));
+
+
+                Output += defect + "\n";
+            }
+            gr.Dispose();
+            ImagePreview = AdditionalOperations.ToBitmapImage(bitmap);
+            bitmap.Dispose();
+        }
+        private void DrawRectangleFromXmlFile(string XMLfileName, string xmlFile)
+        {
+            Bitmap bitmap = new Bitmap(_SelectedFile);
 
             if (File.Exists(xmlFile))
             {
@@ -401,7 +468,7 @@ namespace ViTool.ViewModel
                 Output = OpenFile.ReadToEnd();
 
                 XmlDocument doc = new XmlDocument();
-                doc.Load(Path.Combine(DirectoryPath, fileName));
+                doc.Load(Path.Combine(DirectoryPath, XMLfileName));
                 XmlNodeList nodes = doc.DocumentElement.SelectNodes("/annotation/object");
 
                 Graphics gr = Graphics.FromImage(bitmap);
@@ -437,7 +504,6 @@ namespace ViTool.ViewModel
 
             ImagePreview = AdditionalOperations.ToBitmapImage(bitmap);
             bitmap.Dispose();
-
         }
     }
 }
