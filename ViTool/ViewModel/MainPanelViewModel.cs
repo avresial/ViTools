@@ -19,7 +19,7 @@ namespace ViTool.ViewModel
     public class MainPanelViewModel : ViewModelBase
     {
 
-       
+
         private IndicatorColors indicatorColors;
         private Settings settings;
 
@@ -415,6 +415,8 @@ namespace ViTool.ViewModel
                 DrawRectangleFromXmlFile(XMLfileName, xmlFile);
                 return;
             }
+
+            ImagePreview = new BitmapImage(new Uri(_SelectedFile));
 
         }
 
