@@ -442,8 +442,8 @@ namespace ViTool.ViewModel
                 int defectIndex = int.Parse(defectsData[0]);
                 string defectName = ListOfClasses[defectIndex];
 
-                rectangle.X = (int)(double.Parse(defectsData[1]) * bitmap.Width);
-                rectangle.Y = (int)(double.Parse(defectsData[2]) * bitmap.Height);
+                rectangle.X = (int)((double.Parse(defectsData[1]) - (double.Parse(defectsData[3]) / 2)) * bitmap.Width);
+                rectangle.Y = (int)((double.Parse(defectsData[2]) - (double.Parse(defectsData[4]) / 2)) * bitmap.Height);
 
                 rectangle.Width = (int)(double.Parse(defectsData[3]) * bitmap.Width);
                 rectangle.Height = (int)(double.Parse(defectsData[4]) * bitmap.Height);
