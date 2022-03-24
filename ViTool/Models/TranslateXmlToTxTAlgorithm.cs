@@ -154,9 +154,13 @@ namespace ViTool.Models
             foreach (TxtDefectRow txtDefectRow in defectRows)
                 lines.Add(txtDefectRow.DefectType + " " + txtDefectRow.Left + " " + txtDefectRow.Top + " " + txtDefectRow.Width + " " + txtDefectRow.Height);
 
-            using (StreamWriter file = new StreamWriter(filename))
-                foreach (string line in lines)
-                    file.WriteLineAsync(line);
+            File.Create(filename).Close();
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                File.AppendAllText(filename, lines[i]);
+                if (i != lines.Count - 1) File.AppendAllText(filename, "\n");
+            }
         }
     }
 }
