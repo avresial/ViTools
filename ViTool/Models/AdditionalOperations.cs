@@ -1,40 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Xml;
+using ViTool.Enums;
 
 namespace ViTool.Models
 {
     public static class AdditionalOperations
     {
 
-        public static YoloObjectCounter CountDefects(string directoryWithXMLs)
+        public static YoloObjectCounter CountDefects(string directoryWithAnnotationFiles, AnnotationTypes annotationTypes, List<string> classesList)
         {
-            if (directoryWithXMLs == null || directoryWithXMLs == "") new YoloObjectCounter();
+            if (directoryWithAnnotationFiles == null || directoryWithAnnotationFiles == "") new YoloObjectCounter();
             YoloObjectCounter yoloObjectCounter = new YoloObjectCounter();
 
-            DirectoryInfo d = new DirectoryInfo(directoryWithXMLs);
-            FileInfo[] files = d.GetFiles("*.xml");
-            
-            foreach (FileInfo file in files)yoloObjectCounter.AddCounters(CountDefectsOnSingleFile(file.FullName));
+            DirectoryInfo d = new DirectoryInfo(directoryWithAnnotationFiles);
+            FileInfo[] files = null;
+            switch (annotationTypes)
+            {
+                case AnnotationTypes.TXT:
+                    files = d.GetFiles("*.txt");
+                    break;
+
+                case AnnotationTypes.XML:
+                    files = d.GetFiles("*.xml");
+                    break;
+            }
+
+            foreach (FileInfo file in files) yoloObjectCounter.AddCounters(CountDefectsOnSingleFile(file.FullName, classesList));
 
             return yoloObjectCounter;
         }
 
-        private static YoloObjectCounter CountDefectsOnSingleFile(string pathToSingleXMLFile)
+        private static YoloObjectCounter CountDefectsOnSingleFile(string pathToSingleXMLFile, List<string> classesList)
         {
-            if (Path.GetExtension(pathToSingleXMLFile) != ".xml") return null;
+            YoloObjectCounter yoloObjectCounter = null;
 
+            if (Path.GetExtension(pathToSingleXMLFile) == ".xml") yoloObjectCounter = CountObiectsFromXML(pathToSingleXMLFile);
+            if (Path.GetExtension(pathToSingleXMLFile) == ".txt") yoloObjectCounter = CountObiectsFromTXT(pathToSingleXMLFile, classesList);
+
+            return yoloObjectCounter;
+        }
+
+        private static YoloObjectCounter CountObiectsFromXML(string pathToSingleXMLFile)
+        {
             XmlDocument doc = new XmlDocument();
             doc.Load(pathToSingleXMLFile);
 
             XmlNodeList nodes = doc.DocumentElement.SelectNodes("/annotation/object");
 
             YoloObjectCounter yoloObjectCounter = ConvertXMLNodeToYoloObjectCounter(nodes);
+            return yoloObjectCounter;
+        }
+
+        private static YoloObjectCounter CountObiectsFromTXT(string pathToSingleTXTFile, List<string> classesList)
+        {
+            if (pathToSingleTXTFile.ToLower().Contains("classes")) return null;
+            if (pathToSingleTXTFile.ToLower().Contains("names")) return null;
+
+            YoloObjectCounter yoloObjectCounter = new YoloObjectCounter();
+            string[] fileLines = File.ReadAllLines(pathToSingleTXTFile);
+
+            foreach (string line in fileLines)
+            {
+                if (line == null || line == string.Empty) continue;
+                
+                string[] rows = line.Split(' ');
+                if (rows.Length != 5) continue;
+
+                int classId = int.Parse(rows[0]);
+
+                if (classesList.Count >= classId) yoloObjectCounter.CountObject(classesList[classId]);
+                else yoloObjectCounter.CountObject(rows[0].ToString());
+            }
 
             return yoloObjectCounter;
         }

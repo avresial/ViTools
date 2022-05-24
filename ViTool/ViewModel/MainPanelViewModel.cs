@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
+using ViTool.Enums;
 using ViTool.Models;
 
 namespace ViTool.ViewModel
@@ -306,7 +307,7 @@ namespace ViTool.ViewModel
                     _GetDatasetStatistics = new RelayCommand(
                     () =>
                     {
-                        Output = AdditionalOperations.CountDefects(DirectoryPath).GetCounter();
+                        Output = AdditionalOperations.CountDefects(DirectoryPath, AnnotationTypes.TXT, ListOfClasses.ToList()).GetCounter();
                     },
                     () =>
                     {

@@ -17,6 +17,8 @@ namespace ViTool.Models
 
         public void AddCounters(YoloObjectCounter newCounter)
         {
+            if (newCounter == null) return;
+
             foreach (KeyValuePair<string, int> ObjectAndCountPair in newCounter.CountedObjects)
             {
                 if (!CountedObjects.ContainsKey(ObjectAndCountPair.Key)) CountedObjects.Add(ObjectAndCountPair.Key, 0);
