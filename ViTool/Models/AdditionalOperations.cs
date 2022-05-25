@@ -65,7 +65,7 @@ namespace ViTool.Models
             foreach (string line in fileLines)
             {
                 if (line == null || line == string.Empty) continue;
-                
+
                 string[] rows = line.Split(' ');
                 if (rows.Length != 5) continue;
 
@@ -133,27 +133,36 @@ namespace ViTool.Models
         }
         private static bool DeleteFileWithNoPair(string path)
         {
+            if (path.Contains("names") || path.Contains("classes")) return;
+
             string extension = Path.GetExtension(path);
+            bool jpgExists = false;
+            bool txtExists = false;
+            bool xmlExists = false;
+            bool deleteFile = false;
 
-            if (extension == ".xml")
+            switch (extension)
             {
-                if (!File.Exists(path.Replace(extension, ".jpg")))
-                {
-                    File.Delete(path);
-                    return true;
-                }
+                case ".xml":
+                    jpgExists = File.Exists(path.Replace(extension, ".jpg"));
+                    txtExists = File.Exists(path.Replace(extension, ".txt"));
+                    if (!jpgExists && !txtExists) deleteFile = true;
+                    break;
+
+                case ".jpg":
+                    xmlExists = File.Exists(path.Replace(extension, ".xml"));
+                    txtExists = File.Exists(path.Replace(extension, ".txt"));
+                    if (!xmlExists && !txtExists) deleteFile = true;
+                    break;
+
+                case ".txt":
+                    xmlExists = File.Exists(path.Replace(extension, ".xml"));
+                    jpgExists = File.Exists(path.Replace(extension, ".jpg"));
+                    if (!xmlExists && !jpgExists) deleteFile = true;
+                    break;
             }
 
-
-            if (extension == ".jpg")
-            {
-                if (!File.Exists(path.Replace(extension, ".xml")))
-                {
-                    File.Delete(path);
-                    return true;
-
-                }
-            }
+            if (deleteFile) File.Delete(path);
 
             return false;
         }
