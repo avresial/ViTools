@@ -133,7 +133,7 @@ namespace ViTool.Models
         }
         private static bool DeleteFileWithNoPair(string path)
         {
-            if (path.Contains("names") || path.Contains("classes")) return;
+            if (path.Contains("names") || path.Contains("classes")) return false;
 
             string extension = Path.GetExtension(path);
             bool jpgExists = false;

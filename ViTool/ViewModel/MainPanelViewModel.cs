@@ -146,7 +146,7 @@ namespace ViTool.ViewModel
 
             SettingsData currentSettingsData = settings.ReadSettings();
             DirectoryPath = currentSettingsData.LastOpenedDirectory;
-
+            DirectoryPath = "";
             foreach (string newClass in currentSettingsData.SavedClasses) ListOfClasses.Add(newClass);
             if (DirectoryPath != null && DirectoryPath != "" && DirectoryPath != "No Directory") LoadData(DirectoryPath);
 
